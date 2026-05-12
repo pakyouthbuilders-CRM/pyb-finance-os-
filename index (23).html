@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PYB Finance OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══ TOKENS ═══ */
+:root{
+  --bg:#080b12;--bg2:#0e1420;--bg3:#141d2e;--bg4:#1a2438;--bg5:#212d42;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);
+  --gold:#d4a843;--gold2:#f0c060;--goldg:rgba(212,168,67,.14);--goldd:rgba(212,168,67,.06);
+  --em:#10c98a;--emg:rgba(16,201,138,.12);--emd:rgba(16,201,138,.06);
+  --rose:#f04869;--roseg:rgba(240,72,105,.12);
+  --amber:#f59e0b;--amberg:rgba(245,158,11,.12);
+  --sky:#38bdf8;--skyg:rgba(56,189,248,.12);
+  --violet:#a78bfa;--viog:rgba(167,139,250,.12);
+  --snow:#f8fafc;--ghost:#cbd5e1;--silver:#8892a4;--slate:#4b5563;
+  --r:10px;--r2:14px;--r3:18px;
+  --trans:.16s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--snow);min-height:100vh;overflow-x:hidden}
+
+/* subtle dot grid */
+body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.03) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0}
+
+/* ═══ TOPBAR ═══ */
+.topbar{position:sticky;top:0;z-index:300;height:56px;background:rgba(8,11,18,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:14px}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.brand-gem{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#9a6f1e);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.brand-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--snow);letter-spacing:-.3px}
+.brand-name em{color:var(--gold);font-style:normal}
+.topbar-mid{flex:1;display:flex;justify-content:center;align-items:center;gap:10px}
+.month-chip{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--line);border-radius:40px;padding:4px 14px}
+.live{width:5px;height:5px;border-radius:50%;background:var(--em);box-shadow:0 0 6px var(--em);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.month-chip select{background:transparent;border:none;color:var(--ghost);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;outline:none}
+.month-chip select option{background:var(--bg2)}
+.sync-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--line);border-radius:40px;padding:4px 12px;font-size:11px;color:var(--silver);cursor:pointer;transition:var(--trans)}
+.sync-chip:hover{border-color:var(--gold);color:var(--gold)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.cur-grp{display:flex;background:var(--bg3);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cur-btn{padding:4px 11px;border:none;background:transparent;color:var(--silver);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:var(--trans)}
+.cur-btn.on{background:var(--gold);color:#000}
+.tbtn{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:var(--trans)}
+.tbtn-gold{background:var(--gold);color:#000}
+.tbtn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+.tbtn-ghost{background:var(--bg3);color:var(--ghost);border:1px solid var(--line)}
+.tbtn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ═══ LAYOUT ═══ */
+.shell{display:flex;min-height:calc(100vh - 56px);position:relative;z-index:1}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{width:224px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--line);padding:16px 0 40px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-grp{margin-bottom:2px}
+.sb-lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--slate);padding:0 16px;margin:16px 0 5px;display:flex;align-items:center;gap:8px}
+.sb-lbl::after{content:'';flex:1;height:1px;background:var(--line)}
+.sb-link{display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;transition:var(--trans);border-left:2px solid transparent;color:var(--silver);font-size:13px;font-weight:400;user-select:none}
+.sb-link:hover{background:var(--bg3);color:var(--ghost)}
+.sb-link.on{background:var(--goldd);color:var(--gold);border-left-color:var(--gold);font-weight:500}
+.sb-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--bg3);flex-shrink:0;transition:var(--trans)}
+.sb-link.on .sb-ico{background:var(--goldg)}
+.sb-badge{margin-left:auto;background:var(--roseg);color:var(--rose);font-size:9px;font-weight:800;padding:1px 6px;border-radius:20px}
+
+/* ═══ MAIN ═══ */
+.main{flex:1;padding:24px 28px;overflow-x:hidden;min-height:calc(100vh - 56px)}
+.page{display:none;animation:fadeUp .2s ease}
+.page.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ PAGE HEADER ═══ */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:14px}
+.ph-t{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.4px;color:var(--snow);line-height:1.1}
+.ph-s{font-size:12px;color:var(--silver);margin-top:3px}
+.ph-acts{display:flex;gap:7px;align-items:center;flex-shrink:0}
+
+/* ═══ GRIDS ═══ */
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+
+/* ═══ CARD ═══ */
+.card{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2);padding:18px;transition:border-color var(--trans)}
+.card:hover{border-color:var(--line2)}
+
+/* ═══ KPI ═══ */
+.kpi{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden;transition:all var(--trans)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r2) var(--r2) 0 0}
+.kpi-gold::before{background:linear-gradient(90deg,var(--gold),transparent)}
+.kpi-em::before{background:linear-gradient(90deg,var(--em),transparent)}
+.kpi-rose::before{background:linear-gradient(90deg,var(--rose),transparent)}
+.kpi-amber::before{background:linear-gradient(90deg,var(--amber),transparent)}
+.kpi-sky::before{background:linear-gradient(90deg,var(--sky),transparent)}
+.kpi-violet::before{background:linear-gradient(90deg,var(--violet),transparent)}
+.kpi:hover{transform:translateY(-2px);border-color:var(--line2)}
+.kpi-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--slate);margin-bottom:8px}
+.kpi-val{font-family:'JetBrains Mono',monospace;font-size:1.65rem;font-weight:600;letter-spacing:-1px;line-height:1}
+.kpi-st{display:inline-flex;align-items:center;gap:3px;margin-top:7px;padding:2px 8px;border-radius:40px;font-size:9px;font-weight:800;letter-spacing:.3px}
+.kpi-ft{font-size:10px;color:var(--slate);margin-top:4px}
+.st-good{background:var(--emg);color:var(--em)}
+.st-ok{background:var(--amberg);color:var(--amber)}
+.st-bad{background:var(--roseg);color:var(--rose)}
+.st-info{background:var(--skyg);color:var(--sky)}
+.st-gold{background:var(--goldg);color:var(--gold)}
+
+/* ═══ SECTION HEAD ═══ */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+.sh h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--ghost);display:flex;align-items:center;gap:7px}
+.sh-dot{width:4px;height:4px;border-radius:50%;background:var(--gold)}
+
+/* ═══ BUTTONS ═══ */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--trans);letter-spacing:.2px}
+.btn-gold{background:var(--gold);color:#000}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-ghost{background:var(--bg4);color:var(--ghost);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-rose{background:var(--roseg);color:var(--rose);border:1px solid rgba(240,72,105,.2)}
+.btn-rose:hover{background:rgba(240,72,105,.22)}
+.btn-em{background:var(--emg);color:var(--em);border:1px solid rgba(16,201,138,.2)}
+.btn-sm{padding:4px 10px;font-size:11px;border-radius:7px}
+.btn-xs{padding:2px 7px;font-size:10px;border-radius:6px}
+
+/* ═══ ALERTS ═══ */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--r);font-size:12px;line-height:1.5;margin-bottom:10px;border:1px solid}
+.alert-rose{background:var(--roseg);border-color:rgba(240,72,105,.2);color:#fda4b4}
+.alert-em{background:var(--emd);border-color:rgba(16,201,138,.2);color:#6ee7b7}
+.alert-amber{background:var(--amberg);border-color:rgba(245,158,11,.18);color:#fcd34d}
+.alert-sky{background:var(--skyg);border-color:rgba(56,189,248,.2);color:#7dd3fc}
+.alert-gold{background:var(--goldd);border-color:rgba(212,168,67,.2);color:var(--gold)}
+.alert-ico{font-size:13px;flex-shrink:0;margin-top:1px}
+
+/* ═══ TABLE ═══ */
+.tbl-wrap{border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--bg4)}
+th{padding:9px 13px;text-align:left;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--slate);white-space:nowrap}
+td{padding:10px 13px;font-size:12px;border-top:1px solid rgba(255,255,255,.04);color:var(--ghost)}
+tbody tr{transition:background var(--trans)}
+tbody tr:hover td{background:rgba(255,255,255,.015)}
+.tbl-empty{padding:40px;text-align:center;color:var(--slate)}
+.tbl-empty-ico{font-size:28px;margin-bottom:8px;opacity:.5}
+
+/* ═══ BADGE ═══ */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:40px;font-size:9px;font-weight:800;letter-spacing:.3px;white-space:nowrap}
+.bg-em{background:var(--emg);color:var(--em)}
+.bg-rose{background:var(--roseg);color:var(--rose)}
+.bg-amber{background:var(--amberg);color:var(--amber)}
+.bg-sky{background:var(--skyg);color:var(--sky)}
+.bg-vio{background:var(--viog);color:var(--violet)}
+.bg-gold{background:var(--goldg);color:var(--gold)}
+.bg-slate{background:var(--bg5);color:var(--silver)}
+
+/* ═══ PROGRESS ═══ */
+.prog{height:4px;background:var(--bg5);border-radius:99px;overflow:hidden;margin-top:6px}
+.prog-f{height:100%;border-radius:99px;transition:width .6s ease}
+.pf-gold{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.pf-em{background:linear-gradient(90deg,var(--em),#34d399)}
+.pf-rose{background:linear-gradient(90deg,var(--rose),#fb7185)}
+.pf-amber{background:linear-gradient(90deg,var(--amber),#fcd34d)}
+.pf-sky{background:linear-gradient(90deg,var(--sky),#67e8f9)}
+
+/* ═══ STAT ROW ═══ */
+.sr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.sr:last-child{border-bottom:none}
+.sr-lbl{color:var(--silver)}
+.sr-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
+
+/* ═══ STAGE ═══ */
+.s-strip{display:flex;gap:3px;flex-wrap:wrap;margin:8px 0}
+.s-pill{width:22px;height:22px;border-radius:6px;background:var(--bg5);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--slate);cursor:pointer;transition:all var(--trans)}
+.s-pill.done{background:var(--emg);border-color:rgba(16,201,138,.3);color:var(--em)}
+.s-pill.now{background:var(--gold);border-color:var(--gold);color:#000;box-shadow:0 0 10px var(--goldg);transform:scale(1.15)}
+
+/* ═══ FORM ═══ */
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fspan{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--slate)}
+.field input,.field select,.field textarea{background:var(--bg4);border:1px solid var(--line);border-radius:9px;padding:8px 12px;color:var(--snow);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:400;transition:all var(--trans);outline:none}
+.field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--goldd)}
+.field select option{background:var(--bg2)}
+
+/* ═══ MODAL ═══ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:500;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:var(--r3);padding:26px;width:540px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.7);animation:modalIn .22s cubic-bezier(.34,1.56,.64,1)}
+.modal::-webkit-scrollbar{width:3px}
+.modal::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(14px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:13px;border-bottom:1px solid var(--line)}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;letter-spacing:-.3px}
+.cls-x{width:28px;height:28px;border-radius:7px;background:var(--bg4);border:1px solid var(--line);color:var(--silver);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all var(--trans)}
+.cls-x:hover{background:var(--roseg);color:var(--rose);border-color:rgba(240,72,105,.3)}
+
+/* ═══ BUCKET ═══ */
+.bucket{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2);padding:16px;transition:all var(--trans)}
+.bucket:hover{border-color:var(--line2);transform:translateY(-2px)}
+.bkt-hd{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.bkt-ico{width:36px;height:36px;background:var(--bg4);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.bkt-name{font-weight:600;font-size:13px}
+.bkt-pur{font-size:10px;color:var(--silver);margin-top:1px}
+
+/* ═══ DECISION CARD ═══ */
+.dec{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2);padding:16px;margin-bottom:10px;transition:all var(--trans)}
+.dec:hover{border-color:var(--line2)}
+.dec-bad{border-color:rgba(240,72,105,.3);background:rgba(240,72,105,.04)}
+.dec-ok{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.03)}
+.dec-good{border-color:rgba(16,201,138,.25);background:rgba(16,201,138,.03)}
+.dec-t{font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.dec-b{font-size:12px;color:var(--silver);line-height:1.6}
+
+/* ═══ INLINE INPUT (budget) ═══ */
+.iinput{width:95px;background:var(--bg4);border:1px solid var(--line);border-radius:6px;padding:4px 7px;color:var(--snow);font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;transition:var(--trans)}
+.iinput:focus{border-color:var(--gold)}
+
+/* ═══ SHEETS STEPS ═══ */
+.sstep{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sstep:last-child{border-bottom:none}
+.sstep-num{width:22px;height:22px;border-radius:6px;background:var(--goldg);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:2px}
+.sstep-body{flex:1;font-size:12px;color:var(--silver);line-height:1.5}
+.sstep-body strong{color:var(--snow);font-weight:600}
+.code-box{background:var(--bg4);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);word-break:break-all;margin-top:7px;line-height:1.5}
+
+/* ═══ UTILITY ═══ */
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb0{margin-bottom:0}.fw6{font-weight:600}.fw5{font-weight:500}
+.f10{font-size:10px}.f11{font-size:11px}.f12{font-size:12px}.f13{font-size:13px}
+.fbet{display:flex;justify-content:space-between;align-items:center}
+.fcen{display:flex;align-items:center}
+.flex{display:flex}.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}
+.c-gold{color:var(--gold)}.c-em{color:var(--em)}.c-rose{color:var(--rose)}
+.c-amber{color:var(--amber)}.c-silver{color:var(--silver)}.c-sky{color:var(--sky)}
+.c-violet{color:var(--violet)}.c-snow{color:var(--snow)}
+.mono{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px}
+@media(max-width:900px){.sidebar{display:none}.g5,.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.main{padding:16px}}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-gem">💹</div>
+    <div class="brand-name">PYB <em>Finance OS</em></div>
+  </div>
+  <div class="topbar-mid">
+    <div class="month-chip">
+      <div class="live"></div>
+      <select id="monthSel" onchange="S.month=this.value;save()">
+        <option value="2025-01">January 2025</option><option value="2025-02">February 2025</option>
+        <option value="2025-03">March 2025</option><option value="2025-04">April 2025</option>
+        <option value="2025-05" selected>May 2025</option><option value="2025-06">June 2025</option>
+        <option value="2025-07">July 2025</option><option value="2025-08">August 2025</option>
+        <option value="2025-09">September 2025</option><option value="2025-10">October 2025</option>
+        <option value="2025-11">November 2025</option><option value="2025-12">December 2025</option>
+        <option value="2026-01">January 2026</option><option value="2026-02">February 2026</option>
+        <option value="2026-03">March 2026</option><option value="2026-04">April 2026</option>
+        <option value="2026-05">May 2026</option><option value="2026-06">June 2026</option>
+      </select>
+    </div>
+    <div class="sync-chip" onclick="openM('m-sheets')">📊 Google Sheets Sync</div>
+  </div>
+  <div class="topbar-right">
+    <div class="cur-grp">
+      <button class="cur-btn on" onclick="setCur('PKR',this)">PKR</button>
+      <button class="cur-btn" onclick="setCur('USD',this)">USD</button>
+    </div>
+    <button class="tbtn tbtn-ghost" onclick="exportCSV()">⬇ Export</button>
+    <button class="tbtn tbtn-gold" onclick="openM('m-sheets')">📊 Sheets</button>
+  </div>
+</div>
+
+<div class="shell">
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sb-grp">
+    <div class="sb-lbl">Overview</div>
+    <div class="sb-link on" onclick="go('dashboard',this)"><div class="sb-ico">📊</div>Dashboard</div>
+    <div class="sb-link" onclick="go('decisions',this)"><div class="sb-ico">🧠</div>Decision Center</div>
+    <div class="sb-link" onclick="go('ratios',this)"><div class="sb-ico">📐</div>Financial Ratios</div>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">PYB Business</div>
+    <div class="sb-link" onclick="go('b-income',this)"><div class="sb-ico">💰</div>Business Income</div>
+    <div class="sb-link" onclick="go('b-expense',this)"><div class="sb-ico">📤</div>Business Expenses</div>
+    <div class="sb-link" onclick="go('b-profit',this)"><div class="sb-ico">📈</div>Profit & Owner Pay</div>
+    <div class="sb-link" onclick="go('cashflow',this)"><div class="sb-ico">🔄</div>Cash Flow</div>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">Personal Finance</div>
+    <div class="sb-link" onclick="go('p-income',this)"><div class="sb-ico">👤</div>Personal Income</div>
+    <div class="sb-link" onclick="go('p-expense',this)"><div class="sb-ico">🏠</div>Personal Expenses</div>
+    <div class="sb-link" onclick="go('budget',this)"><div class="sb-ico">📋</div>Budget Planner</div>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">Wealth Building</div>
+    <div class="sb-link" onclick="go('debt',this)"><div class="sb-ico">⚠️</div>Debt Manager<span class="sb-badge" id="sb-debt">0</span></div>
+    <div class="sb-link" onclick="go('savings',this)"><div class="sb-ico">🪣</div>Savings Buckets</div>
+    <div class="sb-link" onclick="go('networth',this)"><div class="sb-ico">🏛️</div>Net Worth</div>
+  </div>
+  <div class="sb-grp">
+    <div class="sb-lbl">Reports</div>
+    <div class="sb-link" onclick="go('report',this)"><div class="sb-ico">📑</div>Monthly Report</div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+<!-- ██ DASHBOARD ██ -->
+<div class="page on" id="page-dashboard">
+  <div class="ph"><div><div class="ph-t">Financial Dashboard</div><div class="ph-s">Business + Personal — complete health at a glance</div></div></div>
+  <div id="dash-alerts"></div>
+  <div class="g5">
+    <div class="kpi kpi-em"><div class="kpi-lbl">Current Ratio</div><div class="kpi-val c-em" id="d-cr">—</div><div class="kpi-st" id="d-cr-s">—</div><div class="prog mt8"><div class="prog-f pf-em" id="d-cr-b" style="width:0%"></div></div><div class="kpi-ft">(Cash+Sav)÷(Exp+Debt)</div></div>
+    <div class="kpi kpi-sky"><div class="kpi-lbl">Expense Ratio</div><div class="kpi-val c-sky" id="d-er">—</div><div class="kpi-st" id="d-er-s">—</div><div class="prog mt8"><div class="prog-f pf-sky" id="d-er-b" style="width:0%"></div></div><div class="kpi-ft">Expenses÷Income×100</div></div>
+    <div class="kpi kpi-gold"><div class="kpi-lbl">Saving Rate</div><div class="kpi-val c-gold" id="d-sr">—</div><div class="kpi-st" id="d-sr-s">—</div><div class="prog mt8"><div class="prog-f pf-gold" id="d-sr-b" style="width:0%"></div></div><div class="kpi-ft">Savings÷Income×100</div></div>
+    <div class="kpi kpi-violet"><div class="kpi-lbl">DTI Ratio</div><div class="kpi-val c-violet" id="d-dti">—</div><div class="kpi-st" id="d-dti-s">—</div><div class="prog mt8"><div class="prog-f pf-sky" id="d-dti-b" style="width:0%"></div></div><div class="kpi-ft">Debt÷Income×100</div></div>
+    <div class="kpi kpi-amber"><div class="kpi-lbl">Net Position</div><div class="kpi-val mono" id="d-np" style="font-size:1.3rem">—</div><div class="kpi-st" id="d-np-s">—</div><div class="kpi-ft">Income−Exp−Debt</div></div>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="sh"><h3><div class="sh-dot"></div>🏢 PYB Business</h3></div>
+      <div class="sr"><span class="sr-lbl">Gross Income</span><span class="sr-val c-em" id="d-binc">—</span></div>
+      <div class="sr"><span class="sr-lbl">Expenses</span><span class="sr-val c-rose" id="d-bexp">—</span></div>
+      <div class="sr"><span class="sr-lbl">Net Profit</span><span class="sr-val" id="d-bpro">—</span></div>
+      <div class="sr"><span class="sr-lbl">Owner Salary</span><span class="sr-val c-gold" id="d-osal">—</span></div>
+      <div class="sr"><span class="sr-lbl">Profit Margin</span><span class="sr-val" id="d-marg">—</span></div>
+      <div class="sr"><span class="sr-lbl">Reinvested</span><span class="sr-val c-em" id="d-rei">—</span></div>
+    </div>
+    <div class="card">
+      <div class="sh"><h3><div class="sh-dot"></div>👤 Personal Finance</h3></div>
+      <div class="sr"><span class="sr-lbl">Personal Income</span><span class="sr-val c-em" id="d-pinc">—</span></div>
+      <div class="sr"><span class="sr-lbl">Expenses</span><span class="sr-val c-rose" id="d-pexp">—</span></div>
+      <div class="sr"><span class="sr-lbl">Essential Exp.</span><span class="sr-val c-amber" id="d-pess">—</span></div>
+      <div class="sr"><span class="sr-lbl">Monthly Savings</span><span class="sr-val c-em" id="d-psav">—</span></div>
+      <div class="sr"><span class="sr-lbl">Emergency Fund</span><span class="sr-val" id="d-ef">—</span></div>
+      <div class="sr"><span class="sr-lbl">Cash Flow</span><span class="sr-val" id="d-cf">—</span></div>
+    </div>
+    <div class="card">
+      <div class="sh"><h3><div class="sh-dot"></div>🪜 Financial Stage</h3></div>
+      <div class="f13 fw6 c-gold" id="stage-name">Calculating...</div>
+      <div class="s-strip" id="stage-bar"></div>
+      <div class="f11 c-silver" id="stage-next"></div>
+      <div class="mt12" style="border-top:1px solid var(--line);padding-top:10px">
+        <div class="sr"><span class="sr-lbl">Total Debt</span><span class="sr-val c-rose" id="d-tdt">—</span></div>
+        <div class="sr"><span class="sr-lbl">Total Savings</span><span class="sr-val c-em" id="d-tsv">—</span></div>
+        <div class="sr"><span class="sr-lbl">Net Worth</span><span class="sr-val c-gold" id="d-nw">—</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- Micro Leakage -->
+  <div class="card mb0">
+    <div class="sh"><h3><div class="sh-dot"></div>🔍 Micro Leakage Detector</h3><span class="badge bg-gold">Annual Impact</span></div>
+    <div class="g4" style="margin-bottom:0">
+      <div class="kpi kpi-rose" style="padding:12px"><div class="kpi-lbl">Non-Essential</div><div class="kpi-val c-rose mono" id="lk-non" style="font-size:1.2rem">0</div><div class="kpi-ft">Subscriptions,shopping</div></div>
+      <div class="kpi kpi-amber" style="padding:12px"><div class="kpi-lbl">Emotional</div><div class="kpi-val c-amber mono" id="lk-emo" style="font-size:1.2rem">0</div><div class="kpi-ft">Stress spending</div></div>
+      <div class="kpi kpi-rose" style="padding:12px"><div class="kpi-lbl">Status</div><div class="kpi-val c-rose mono" id="lk-sta" style="font-size:1.2rem">0</div><div class="kpi-ft">To impress others</div></div>
+      <div class="kpi kpi-violet" style="padding:12px"><div class="kpi-lbl">Habit</div><div class="kpi-val c-violet mono" id="lk-hab" style="font-size:1.2rem">0</div><div class="kpi-ft">Daily drains</div></div>
+    </div>
+    <div class="mt8 f11 c-silver">Annual waste: <strong class="c-rose mono" id="lk-yr">0</strong> &nbsp;|&nbsp; 5-yr opportunity cost @12%: <strong class="c-gold mono" id="lk-5yr">0</strong></div>
+  </div>
+</div>
+
+<!-- ██ DECISION CENTER ██ -->
+<div class="page" id="page-decisions">
+  <div class="ph"><div><div class="ph-t">🧠 Decision Center</div><div class="ph-s">Kahan galti ho rahi hai • Kya fix karna hai • Priority order</div></div></div>
+  <div id="dec-content"><div class="alert alert-sky"><span class="alert-ico">ℹ️</span>Pehle data enter karo phir complete financial analysis yahan aayegi.</div></div>
+</div>
+
+<!-- ██ RATIOS ██ -->
+<div class="page" id="page-ratios">
+  <div class="ph"><div><div class="ph-t">📐 Financial Ratios</div><div class="ph-s">Global standards — numbers jo sab bata dete hain</div></div></div>
+  <div class="g3">
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Current Ratio</h3><span class="badge bg-em">Liquidity</span></div><div class="kpi-val c-em mono" id="r-cr" style="font-size:2rem">—</div><div class="kpi-st mt8" id="r-cr-s">—</div><div class="f11 c-silver mt8">(Cash+Savings)÷(Exp+Debt Pmts)</div><div class="mt12" style="border-top:1px solid var(--line);padding-top:8px"><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">Below 1.0</span><span class="badge bg-rose">At Risk</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">1.0 – 1.5</span><span class="badge bg-amber">Surviving</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">1.5 – 3.0</span><span class="badge bg-em">Stable</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">Above 3.0</span><span class="badge bg-gold">Strong</span></div></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Expense Ratio</h3><span class="badge bg-sky">Efficiency</span></div><div class="kpi-val c-sky mono" id="r-er" style="font-size:2rem">—</div><div class="kpi-st mt8" id="r-er-s">—</div><div class="f11 c-silver mt8">(Total Expenses÷Income)×100</div><div class="mt12" style="border-top:1px solid var(--line);padding-top:8px"><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">Below 50%</span><span class="badge bg-gold">Excellent</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">50–70%</span><span class="badge bg-em">Good</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">70–90%</span><span class="badge bg-amber">Unstable</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">Above 90%</span><span class="badge bg-rose">Dangerous</span></div></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Saving Rate</h3><span class="badge bg-gold">Wealth</span></div><div class="kpi-val c-gold mono" id="r-sr" style="font-size:2rem">—</div><div class="kpi-st mt8" id="r-sr-s">—</div><div class="f11 c-silver mt8">(Net Savings÷Income)×100</div><div class="mt12" style="border-top:1px solid var(--line);padding-top:8px"><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">0%</span><span class="badge bg-rose">Danger</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">1–10%</span><span class="badge bg-amber">Basic</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">10–20%</span><span class="badge bg-em">Good</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">20%+</span><span class="badge bg-gold">Strong</span></div></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>DTI Ratio</h3><span class="badge bg-vio">Debt</span></div><div class="kpi-val c-violet mono" id="r-dti" style="font-size:2rem">—</div><div class="kpi-st mt8" id="r-dti-s">—</div><div class="f11 c-silver mt8">(Monthly Debt÷Income)×100</div><div class="mt12" style="border-top:1px solid var(--line);padding-top:8px"><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">Below 20%</span><span class="badge bg-em">Safe</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">20–40%</span><span class="badge bg-amber">Risk</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">Above 40%</span><span class="badge bg-rose">Danger</span></div></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Liquidity Coverage</h3><span class="badge bg-em">Safety</span></div><div class="kpi-val c-em mono" id="r-lcr" style="font-size:2rem">—</div><div class="kpi-st mt8" id="r-lcr-s">—</div><div class="f11 c-silver mt8">Liquid Assets÷Monthly Essential Exp</div><div class="mt12" style="border-top:1px solid var(--line);padding-top:8px"><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">1–2 months</span><span class="badge bg-amber">Beginner</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">3–6 months</span><span class="badge bg-em">Safe</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">6–12 months</span><span class="badge bg-gold">Strong</span></div></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Investment Ratio</h3><span class="badge bg-sky">Growth</span></div><div class="kpi-val c-sky mono" id="r-ir" style="font-size:2rem">—</div><div class="kpi-st mt8" id="r-ir-s">—</div><div class="f11 c-silver mt8">(Total Invested÷Income)×100</div><div class="mt12" style="border-top:1px solid var(--line);padding-top:8px"><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">0%</span><span class="badge bg-amber">No Growth</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">1–15%</span><span class="badge bg-em">Building</span></div><div class="sr" style="padding:4px 0"><span class="sr-lbl f10">15%+</span><span class="badge bg-gold">Wealth Mode</span></div></div></div>
+  </div>
+  <div class="alert alert-gold mt8"><span class="alert-ico">💡</span><strong>Global Rule:</strong> Real Return = Nominal Return − Inflation Rate. Agar investment return 12% hai aur inflation 15% hai — aap actually poorer ho rahe hain real terms mein.</div>
+</div>
+
+<!-- ██ BUSINESS INCOME ██ -->
+<div class="page" id="page-b-income">
+  <div class="ph"><div><div class="ph-t">💰 Business Income</div><div class="ph-s">Pak Youth Builder — ecommerce services earnings</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-bi')">+ Add Income</button></div></div>
+  <div class="g4"><div class="kpi kpi-em"><div class="kpi-lbl">Month Total</div><div class="kpi-val c-em mono" id="bi-tot">0</div></div><div class="kpi kpi-sky"><div class="kpi-lbl">Entries</div><div class="kpi-val c-sky mono" id="bi-cnt">0</div></div><div class="kpi kpi-gold"><div class="kpi-lbl">Average</div><div class="kpi-val c-gold mono" id="bi-avg">0</div></div><div class="kpi kpi-amber"><div class="kpi-lbl">YTD Total</div><div class="kpi-val c-amber mono" id="bi-ytd">0</div></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Category</th><th>Client/Platform</th><th>Gross Rev.</th><th>PYB Earning</th><th>Status</th><th>Note</th><th></th></tr></thead><tbody id="bi-tbody"></tbody></table></div>
+</div>
+
+<!-- ██ BUSINESS EXPENSE ██ -->
+<div class="page" id="page-b-expense">
+  <div class="ph"><div><div class="ph-t">📤 Business Expenses</div><div class="ph-s">PYB operational costs — categorized</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-be')">+ Add Expense</button></div></div>
+  <div class="g4"><div class="kpi kpi-rose"><div class="kpi-lbl">Tools & Software</div><div class="kpi-val c-rose mono" id="bc-tools">0</div></div><div class="kpi kpi-violet"><div class="kpi-lbl">Team / Salaries</div><div class="kpi-val c-violet mono" id="bc-team">0</div></div><div class="kpi kpi-amber"><div class="kpi-lbl">Marketing</div><div class="kpi-val c-amber mono" id="bc-mkt">0</div></div><div class="kpi kpi-sky"><div class="kpi-lbl">Office / Other</div><div class="kpi-val c-sky mono" id="bc-oth">0</div></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Type</th><th>Essential</th><th>Amount</th><th></th></tr></thead><tbody id="be-tbody"></tbody></table></div>
+</div>
+
+<!-- ██ PROFIT & OWNER ██ -->
+<div class="page" id="page-b-profit">
+  <div class="ph"><div><div class="ph-t">📈 Profit & Owner Salary</div><div class="ph-s">Business Money ≠ Personal Money — Global Rule</div></div></div>
+  <div class="alert alert-gold"><span class="alert-ico">🏛️</span><strong>Global Best Practice:</strong> Pay yourself fixed salary from profit — not revenue. Early stage: 10–40% of net profit. Reinvest the rest to grow the business.</div>
+  <div class="g3 mt16"><div class="kpi kpi-em"><div class="kpi-lbl">Gross Income</div><div class="kpi-val c-em mono" id="p-gross">0</div></div><div class="kpi kpi-rose"><div class="kpi-lbl">Total Expenses</div><div class="kpi-val c-rose mono" id="p-exp">0</div></div><div class="kpi kpi-gold"><div class="kpi-lbl">Net Profit</div><div class="kpi-val mono" id="p-net">0</div></div></div>
+  <div class="card mt16">
+    <div class="sh"><h3><div class="sh-dot"></div>Owner Salary Calculator</h3></div>
+    <div class="fg3">
+      <div class="field"><label>Net Profit This Month</label><input type="number" id="op-profit" placeholder="e.g. 150000" oninput="calcOwner()"></div>
+      <div class="field"><label>Your Salary % (10–40%)</label><input type="number" id="op-pct" value="25" min="1" max="100" oninput="calcOwner()"></div>
+      <div class="field"><label>Reinvestment %</label><input type="number" id="op-rei-p" value="75" readonly style="opacity:.5"></div>
+    </div>
+    <div class="g4 mt16">
+      <div class="kpi kpi-gold" style="padding:12px"><div class="kpi-lbl">Your Salary</div><div class="kpi-val c-gold mono" id="op-sal" style="font-size:1.3rem">0</div></div>
+      <div class="kpi kpi-em" style="padding:12px"><div class="kpi-lbl">Reinvest</div><div class="kpi-val c-em mono" id="op-rei" style="font-size:1.3rem">0</div></div>
+      <div class="kpi kpi-sky" style="padding:12px"><div class="kpi-lbl">Profit Margin</div><div class="kpi-val c-sky mono" id="op-mrg" style="font-size:1.3rem">0%</div></div>
+      <div class="kpi kpi-violet" style="padding:12px"><div class="kpi-lbl">Annual Salary</div><div class="kpi-val c-violet mono" id="op-ann" style="font-size:1.3rem">0</div></div>
+    </div>
+    <div class="flex g10 mt16"><button class="btn btn-gold" onclick="saveOwner()">✓ Set as My Salary</button><button class="btn btn-ghost" onclick="calcOwner()">🔄 Recalculate</button></div>
+  </div>
+</div>
+
+<!-- ██ CASH FLOW ██ -->
+<div class="page" id="page-cashflow">
+  <div class="ph"><div><div class="ph-t">🔄 Cash Flow Analysis</div><div class="ph-s">Global Principle: Cash flow is the oxygen of any business</div></div></div>
+  <div class="g3">
+    <div class="kpi kpi-em"><div class="kpi-lbl">Total Cash Inflow</div><div class="kpi-val c-em mono" id="cf-in">0</div><div class="kpi-ft">Income > Expenses = Growth Potential</div></div>
+    <div class="kpi kpi-rose"><div class="kpi-lbl">Total Cash Outflow</div><div class="kpi-val c-rose mono" id="cf-out">0</div><div class="kpi-ft">Control outflow to protect growth</div></div>
+    <div class="kpi kpi-gold"><div class="kpi-lbl">Net Cash Flow</div><div class="kpi-val mono" id="cf-net">0</div><div class="kpi-st" id="cf-st">—</div></div>
+  </div>
+  <div class="g3">
+    <div class="dec dec-good"><div class="dec-t">✅ Positive Cash Flow</div><div class="dec-b">Income &gt; Expenses → Growth Potential. Invest surplus wisely. Wealth building starts here.</div></div>
+    <div class="dec dec-ok"><div class="dec-t">⚡ Break-Even</div><div class="dec-b">Income = Expenses → Stuck Life. No growth possible. Cut expenses or increase income immediately.</div></div>
+    <div class="dec dec-bad"><div class="dec-t">🔴 Negative Cash Flow</div><div class="dec-b">Income &lt; Expenses → Debt or Capital Loss. Emergency action required. Fori kharche kato.</div></div>
+  </div>
+  <div class="card">
+    <div class="sh"><h3><div class="sh-dot"></div>Micro Leakage — Annual Opportunity Cost</h3></div>
+    <div class="g4" style="margin-bottom:0">
+      <div><div class="f10 c-silver">Non-Essential/mo</div><div class="f13 fw6 c-rose mono" id="lk2-non">0</div></div>
+      <div><div class="f10 c-silver">Annual waste</div><div class="f13 fw6 c-rose mono" id="lk2-yr">0</div></div>
+      <div><div class="f10 c-silver">5-yr opp. cost @12%</div><div class="f13 fw6 c-amber mono" id="lk2-5yr">0</div></div>
+      <div><div class="f10 c-silver">If cut 50% → save/yr</div><div class="f13 fw6 c-em mono" id="lk2-cut">0</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ PERSONAL INCOME ██ -->
+<div class="page" id="page-p-income">
+  <div class="ph"><div><div class="ph-t">👤 Personal Income</div><div class="ph-s">Owner salary + any side income</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-pi')">+ Add Income</button></div></div>
+  <div class="g3"><div class="kpi kpi-em"><div class="kpi-lbl">Total Personal Income</div><div class="kpi-val c-em mono" id="pi-tot">0</div></div><div class="kpi kpi-gold"><div class="kpi-lbl">Owner Salary</div><div class="kpi-val c-gold mono" id="pi-own">0</div></div><div class="kpi kpi-sky"><div class="kpi-lbl">Side Income</div><div class="kpi-val c-sky mono" id="pi-sid">0</div></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Source</th><th>Amount</th><th>Note</th><th></th></tr></thead><tbody id="pi-tbody"></tbody></table></div>
+</div>
+
+<!-- ██ PERSONAL EXPENSE ██ -->
+<div class="page" id="page-p-expense">
+  <div class="ph"><div><div class="ph-t">🏠 Personal Expenses</div><div class="ph-s">Categorized — find micro-leakage, stop money drain</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-pe')">+ Add Expense</button></div></div>
+  <div class="g5"><div class="kpi kpi-em"><div class="kpi-lbl">Essential</div><div class="kpi-val c-em mono" id="pc-ess" style="font-size:1.2rem">0</div><div class="kpi-ft">Rent,food,bills</div></div><div class="kpi kpi-amber"><div class="kpi-lbl">Non-Essential</div><div class="kpi-val c-amber mono" id="pc-non" style="font-size:1.2rem">0</div><div class="kpi-ft">Can be cut</div></div><div class="kpi kpi-rose"><div class="kpi-lbl">Emotional</div><div class="kpi-val c-rose mono" id="pc-emo" style="font-size:1.2rem">0</div><div class="kpi-ft">Mood spending</div></div><div class="kpi kpi-rose"><div class="kpi-lbl">Status</div><div class="kpi-val c-rose mono" id="pc-sta" style="font-size:1.2rem">0</div><div class="kpi-ft">To impress</div></div><div class="kpi kpi-violet"><div class="kpi-lbl">Habit</div><div class="kpi-val c-violet mono" id="pc-hab" style="font-size:1.2rem">0</div><div class="kpi-ft">Daily drains</div></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Category</th><th>Type</th><th>Description</th><th>Amount</th><th>Annual Impact</th><th></th></tr></thead><tbody id="pe-tbody"></tbody></table></div>
+</div>
+
+<!-- ██ BUDGET ██ -->
+<div class="page" id="page-budget">
+  <div class="ph"><div><div class="ph-t">📋 Budget Planner</div><div class="ph-s">Plan BEFORE you spend — Zero-Based or 50/30/20 method</div></div><div class="ph-acts"><button class="btn btn-ghost btn-sm" onclick="addBudRow()">+ Category</button></div></div>
+  <div class="alert alert-gold"><span class="alert-ico">💡</span><strong>Zero-Based Rule:</strong> Income − All Categories = 0. Every rupee must have a job. "Unassigned money is always wasted."</div>
+  <div class="card mt16">
+    <div class="fg3">
+      <div class="field"><label>Monthly Income (Personal)</label><input type="number" id="bud-inc" placeholder="e.g. 80000" oninput="renderBudget()"></div>
+      <div class="field"><label>Budget Method</label><select id="bud-meth" onchange="applyMethod()"><option value="zero">Zero-Based Budgeting</option><option value="503020">50/30/20 Rule</option></select></div>
+      <div class="field"><label>Savings Target %</label><input type="number" id="bud-sav" value="20" min="0" max="100" oninput="renderBudget()"></div>
+    </div>
+  </div>
+  <div class="tbl-wrap mt16"><table><thead><tr><th>Category</th><th>Budgeted</th><th>Actual</th><th>Remaining</th><th>Used %</th><th>Status</th></tr></thead><tbody id="bud-tbody"></tbody></table></div>
+  <div class="card mt16">
+    <div class="g3" style="margin-bottom:0">
+      <div class="sr"><span class="sr-lbl fw6">Total Income</span><span class="sr-val c-em" id="b-tinc">0</span></div>
+      <div class="sr"><span class="sr-lbl fw6">Total Budgeted</span><span class="sr-val" id="b-tbud">0</span></div>
+      <div class="sr"><span class="sr-lbl fw6">Unassigned (must = 0)</span><span class="sr-val" id="b-una">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██ DEBT ██ -->
+<div class="page" id="page-debt">
+  <div class="ph"><div><div class="ph-t">⚠️ Debt Manager</div><div class="ph-s">Avalanche + Snowball — global debt elimination strategy</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-debt')">+ Add Debt</button></div></div>
+  <div class="alert alert-amber"><span class="alert-ico">🌍</span><strong>Global Strategy:</strong> Avalanche = highest interest first (saves money). Snowball = smallest balance first (builds motivation). Never panic-invest to escape debt.</div>
+  <div class="g3"><div class="kpi kpi-rose"><div class="kpi-lbl">Total Debt</div><div class="kpi-val c-rose mono" id="dt-tot">0</div></div><div class="kpi kpi-amber"><div class="kpi-lbl">Monthly Payments</div><div class="kpi-val c-amber mono" id="dt-mon">0</div></div><div class="kpi kpi-violet"><div class="kpi-lbl">DTI Ratio</div><div class="kpi-val mono" id="dt-dti">0%</div><div class="kpi-st" id="dt-dti-s">—</div></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Creditor</th><th>Total</th><th>Monthly</th><th>Due Day</th><th>Interest%</th><th>Type</th><th>Strategy</th><th>Progress</th><th></th></tr></thead><tbody id="dt-tbody"></tbody></table></div>
+</div>
+
+<!-- ██ SAVINGS ██ -->
+<div class="page" id="page-savings">
+  <div class="ph"><div><div class="ph-t">🪣 Savings Buckets</div><div class="ph-s">Save with purpose — each bucket has a name, goal and timeline</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-sav')">+ Add Bucket</button></div></div>
+  <div class="alert alert-em"><span class="alert-ico">💚</span><strong>Save First Model:</strong> Income → Saving → Expenses. "You don't save what's left — you spend what's left after saving."</div>
+  <div class="card mt16">
+    <div class="sh"><h3><div class="sh-dot"></div>🆘 Emergency Fund — Non-Negotiable</h3><span class="badge bg-rose">Compulsory</span></div>
+    <div class="fg3">
+      <div class="field"><label>Essential Monthly Expenses</label><input type="number" id="ef-exp" placeholder="e.g. 40000" oninput="updEF()"></div>
+      <div class="field"><label>Amount Saved So Far</label><input type="number" id="ef-sav" placeholder="e.g. 50000" oninput="updEF()"></div>
+      <div class="field"><label>Target Months</label><select id="ef-mo" onchange="updEF()"><option value="2">2 months — Beginner</option><option value="3">3 months</option><option value="6" selected>6 months — Safe</option><option value="12">12 months — Strong</option></select></div>
+    </div>
+    <div class="fbet mt16">
+      <div><span class="f11 c-silver">Saved: </span><span class="fw6 mono c-em" id="ef-s-l">0</span></div>
+      <div><span class="f11 c-silver">Target: </span><span class="fw6 mono" id="ef-t-l">0</span></div>
+      <div><span class="fw6 c-gold" id="ef-pct">0%</span></div>
+      <div><span class="f11 c-silver">Months left: </span><span class="fw6 mono c-amber" id="ef-ml">—</span></div>
+    </div>
+    <div class="prog mt8"><div class="prog-f pf-em" id="ef-bar" style="width:0%"></div></div>
+  </div>
+  <div class="g3 mt20" id="sav-grid"></div>
+</div>
+
+<!-- ██ NET WORTH ██ -->
+<div class="page" id="page-networth">
+  <div class="ph"><div><div class="ph-t">🏛️ Net Worth Tracker</div><div class="ph-s">Net Worth = Total Assets − Total Liabilities</div></div><div class="ph-acts"><button class="btn btn-gold" onclick="openM('m-asset')">+ Add Asset/Liability</button></div></div>
+  <div class="g3"><div class="kpi kpi-em"><div class="kpi-lbl">Total Assets</div><div class="kpi-val c-em mono" id="nw-a">0</div></div><div class="kpi kpi-rose"><div class="kpi-lbl">Total Liabilities</div><div class="kpi-val c-rose mono" id="nw-l">0</div></div><div class="kpi kpi-gold"><div class="kpi-lbl">Net Worth</div><div class="kpi-val mono" id="nw-n">0</div><div class="kpi-st" id="nw-s">—</div></div></div>
+  <div class="g2">
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Assets — Generate Income</h3></div><div id="asset-list"><div class="tbl-empty"><div class="tbl-empty-ico">🏛️</div><p>No assets added yet</p></div></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot" style="background:var(--rose)"></div>Liabilities — Cost Money</h3></div><div id="liab-list"><div class="tbl-empty"><div class="tbl-empty-ico">✅</div><p>No liabilities!</p></div></div></div>
+  </div>
+  <div class="alert alert-sky mt8"><span class="alert-ico">📚</span><strong>Asset vs Liability:</strong> Asset puts money IN your pocket. Liability takes money OUT. A car for business = asset. A car on installment for status = liability.</div>
+</div>
+
+<!-- ██ REPORT ██ -->
+<div class="page" id="page-report">
+  <div class="ph"><div><div class="ph-t">📑 Monthly Report</div><div class="ph-s">Complete review — kahan ho, kahan jana hai</div></div><div class="ph-acts"><button class="btn btn-ghost btn-sm" onclick="updReport()">🔄 Refresh</button><button class="btn btn-gold btn-sm" onclick="exportCSV()">⬇ Export</button></div></div>
+  <div class="g2">
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Financial Summary</h3></div><div class="sr"><span class="sr-lbl">Business Income</span><span class="sr-val c-em" id="rp-bi">—</span></div><div class="sr"><span class="sr-lbl">Business Expenses</span><span class="sr-val c-rose" id="rp-be">—</span></div><div class="sr"><span class="sr-lbl">Business Profit</span><span class="sr-val" id="rp-bp">—</span></div><div class="sr"><span class="sr-lbl">Personal Income</span><span class="sr-val c-em" id="rp-pi">—</span></div><div class="sr"><span class="sr-lbl">Personal Expenses</span><span class="sr-val c-rose" id="rp-pe">—</span></div><div class="sr"><span class="sr-lbl">Net Position</span><span class="sr-val fw6" id="rp-np">—</span></div><div class="sr"><span class="sr-lbl">Amount Saved</span><span class="sr-val c-em" id="rp-sv">—</span></div></div>
+    <div class="card"><div class="sh"><h3><div class="sh-dot"></div>Key Ratios</h3></div><div class="sr"><span class="sr-lbl">Current Ratio</span><span class="sr-val" id="rp-cr">—</span></div><div class="sr"><span class="sr-lbl">Expense Ratio</span><span class="sr-val" id="rp-er">—</span></div><div class="sr"><span class="sr-lbl">Saving Rate</span><span class="sr-val" id="rp-sr">—</span></div><div class="sr"><span class="sr-lbl">DTI Ratio</span><span class="sr-val" id="rp-dti">—</span></div><div class="sr"><span class="sr-lbl">Financial Stage</span><span class="sr-val c-gold" id="rp-stg">—</span></div><div class="sr"><span class="sr-lbl">Profit Margin</span><span class="sr-val" id="rp-mg">—</span></div><div class="sr"><span class="sr-lbl">Net Worth</span><span class="sr-val c-gold" id="rp-nw">—</span></div></div>
+  </div>
+  <div class="card mt16"><div class="sh"><h3><div class="sh-dot" style="background:var(--rose)"></div>⚠️ Mistakes & Corrections</h3></div><div id="rp-mistakes"><div class="tbl-empty"><div class="tbl-empty-ico">📊</div><p>Click Refresh to generate analysis</p></div></div></div>
+  <div class="card mt16"><div class="sh"><h3><div class="sh-dot"></div>✅ Next Month Action Plan</h3></div><div id="rp-actions"><div class="tbl-empty"><p>Click Refresh to generate plan</p></div></div></div>
+</div>
+
+</main>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<!-- Business Income -->
+<div class="overlay" id="m-bi"><div class="modal"><div class="modal-hd"><div class="modal-title">💰 Add Business Income</div><button class="cls-x" onclick="closeM('m-bi')">×</button></div><div class="fg2"><div class="field"><label>Date</label><input type="date" id="bi-date"></div><div class="field"><label>Service Category</label><select id="bi-cat"><option>eBay Store Management</option><option>Walmart Store Management</option><option>TikTok Store Management</option><option>Client Commission</option><option>Consultation / Setup Fee</option><option>Other Service</option></select></div><div class="field"><label>Client / Platform</label><input type="text" id="bi-cli" placeholder="e.g. Ali Hassan / eBay US"></div><div class="field"><label>Client Gross Revenue</label><input type="number" id="bi-rev" value="0" placeholder="0"></div><div class="field"><label>PYB Commission / Amount</label><input type="number" id="bi-amt" placeholder="Your actual earning"></div><div class="field"><label>Payment Status</label><select id="bi-st"><option>Received</option><option>Pending</option><option>Partial</option></select></div><div class="field fspan"><label>Note</label><input type="text" id="bi-note" placeholder="Optional"></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addBI()">✓ Add Income</button><button class="btn btn-ghost" onclick="closeM('m-bi')">Cancel</button></div></div></div>
+
+<!-- Business Expense -->
+<div class="overlay" id="m-be"><div class="modal"><div class="modal-hd"><div class="modal-title">📤 Add Business Expense</div><button class="cls-x" onclick="closeM('m-be')">×</button></div><div class="fg2"><div class="field"><label>Date</label><input type="date" id="be-date"></div><div class="field"><label>Category</label><select id="be-cat"><option value="tools">Tools & Software</option><option value="team">Team / Salaries</option><option value="mkt">Marketing & Ads</option><option value="oth">Office / Other</option></select></div><div class="field"><label>Description</label><input type="text" id="be-desc" placeholder="e.g. Helium 10 subscription"></div><div class="field"><label>Fixed or Variable</label><select id="be-type"><option>Fixed</option><option>Variable</option></select></div><div class="field"><label>Essential?</label><select id="be-ess"><option>Yes — Essential</option><option>No — Can Cut</option></select></div><div class="field fspan"><label>Amount</label><input type="number" id="be-amt" placeholder="0"></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addBE()">✓ Add Expense</button><button class="btn btn-ghost" onclick="closeM('m-be')">Cancel</button></div></div></div>
+
+<!-- Personal Income -->
+<div class="overlay" id="m-pi"><div class="modal"><div class="modal-hd"><div class="modal-title">👤 Add Personal Income</div><button class="cls-x" onclick="closeM('m-pi')">×</button></div><div class="fg2"><div class="field"><label>Date</label><input type="date" id="pi-date"></div><div class="field"><label>Income Type</label><select id="pi-type"><option>Owner Salary (from PYB)</option><option>Active Income — Job</option><option>Side Hustle</option><option>Freelancing</option><option>Passive Income</option><option>Rental Income</option><option>Other</option></select></div><div class="field"><label>Source</label><input type="text" id="pi-src" placeholder="e.g. PYB Salary"></div><div class="field fspan"><label>Amount</label><input type="number" id="pi-amt" placeholder="0"></div><div class="field fspan"><label>Note</label><input type="text" id="pi-note" placeholder="Optional"></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addPI()">✓ Add Income</button><button class="btn btn-ghost" onclick="closeM('m-pi')">Cancel</button></div></div></div>
+
+<!-- Personal Expense -->
+<div class="overlay" id="m-pe"><div class="modal"><div class="modal-hd"><div class="modal-title">🏠 Add Personal Expense</div><button class="cls-x" onclick="closeM('m-pe')">×</button></div><div class="fg2"><div class="field"><label>Date</label><input type="date" id="pe-date"></div><div class="field"><label>Category</label><select id="pe-cat"><option value="ess">Essential (Rent/Food/Bills)</option><option value="non">Non-Essential</option><option value="emo">Emotional Spending</option><option value="sta">Status Spending</option><option value="hab">Habit Spending</option></select></div><div class="field"><label>Fixed or Variable</label><select id="pe-type"><option>Fixed</option><option>Variable</option></select></div><div class="field"><label>Description</label><input type="text" id="pe-desc" placeholder="e.g. Rent, Groceries"></div><div class="field fspan"><label>Amount</label><input type="number" id="pe-amt" placeholder="0"></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addPE()">✓ Add Expense</button><button class="btn btn-ghost" onclick="closeM('m-pe')">Cancel</button></div></div></div>
+
+<!-- Debt -->
+<div class="overlay" id="m-debt"><div class="modal"><div class="modal-hd"><div class="modal-title">⚠️ Add Debt / Loan</div><button class="cls-x" onclick="closeM('m-debt')">×</button></div><div class="fg2"><div class="field"><label>Creditor / Lender</label><input type="text" id="dt-cred" placeholder="e.g. Bank, Friend Name"></div><div class="field"><label>Total Amount Owed</label><input type="number" id="dt-tot" placeholder="0"></div><div class="field"><label>Monthly Payment</label><input type="number" id="dt-mon" placeholder="0"></div><div class="field"><label>Interest Rate % (annual)</label><input type="number" id="dt-int" value="0" placeholder="0"></div><div class="field"><label>Due Day of Month</label><input type="number" id="dt-due" placeholder="e.g. 5" min="1" max="31"></div><div class="field"><label>Debt Type</label><select id="dt-type"><option value="interest">Interest-Based (Riba) ⚠️ Clear FIRST</option><option value="personal">Personal Loan</option><option value="install">Installment / EMI</option><option value="business">Business Loan (Good Debt)</option><option value="credit">Credit Card</option></select></div><div class="field"><label>Strategy</label><select id="dt-strat"><option value="1">🔴 Avalanche — Highest Interest First</option><option value="2">🟡 Snowball — Smallest Balance First</option><option value="3">🟢 Minimum — Low Priority</option></select></div><div class="field fspan"><label>Amount Already Paid</label><input type="number" id="dt-paid" value="0"></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addDebt()">✓ Add Debt</button><button class="btn btn-ghost" onclick="closeM('m-debt')">Cancel</button></div></div></div>
+
+<!-- Savings Bucket -->
+<div class="overlay" id="m-sav"><div class="modal"><div class="modal-hd"><div class="modal-title">🪣 Add Savings Bucket</div><button class="cls-x" onclick="closeM('m-sav')">×</button></div><div class="fg2"><div class="field"><label>Bucket Name</label><input type="text" id="sv-name" placeholder="e.g. Equipment, Marriage"></div><div class="field"><label>Emoji Icon</label><input type="text" id="sv-ico" value="🎯" maxlength="2"></div><div class="field"><label>Target Amount</label><input type="number" id="sv-tgt" placeholder="0"></div><div class="field"><label>Saved So Far</label><input type="number" id="sv-sav" value="0"></div><div class="field"><label>Monthly Contribution</label><input type="number" id="sv-mo" placeholder="0"></div><div class="field"><label>Timeline (months)</label><input type="number" id="sv-time" placeholder="e.g. 24"></div><div class="field fspan"><label>Purpose</label><select id="sv-pur"><option>Business Growth</option><option>Emergency Reserve</option><option>Personal Goal</option><option>Education</option><option>Equipment / Tools</option><option>Marriage</option><option>House / Property</option><option>Investment Capital</option><option>Other</option></select></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addBucket()">✓ Add Bucket</button><button class="btn btn-ghost" onclick="closeM('m-sav')">Cancel</button></div></div></div>
+
+<!-- Asset -->
+<div class="overlay" id="m-asset"><div class="modal"><div class="modal-hd"><div class="modal-title">🏛️ Add Asset / Liability</div><button class="cls-x" onclick="closeM('m-asset')">×</button></div><div class="fg2"><div class="field"><label>Name</label><input type="text" id="as-name" placeholder="e.g. Business Equipment, Plot"></div><div class="field"><label>Type</label><select id="as-type"><option value="asset">Asset (Generates Income)</option><option value="liability">Liability (Costs Money)</option></select></div><div class="field"><label>Category</label><select id="as-cat"><option>Business / Productive Asset</option><option>Cash / Savings</option><option>Real Estate</option><option>Vehicle</option><option>Equipment</option><option>Investment</option><option>Other</option></select></div><div class="field fspan"><label>Current Value</label><input type="number" id="as-val" placeholder="0"></div></div><div class="flex g10 mt20"><button class="btn btn-gold" onclick="addAsset()">✓ Add</button><button class="btn btn-ghost" onclick="closeM('m-asset')">Cancel</button></div></div></div>
+
+<!-- Google Sheets -->
+<div class="overlay" id="m-sheets"><div class="modal"><div class="modal-hd"><div class="modal-title">📊 Google Sheets Integration</div><button class="cls-x" onclick="closeM('m-sheets')">×</button></div>
+<div class="alert alert-gold mb0" style="margin-bottom:14px"><span class="alert-ico">✨</span>Data bilkul CRM ki tarah Google Sheets mein save hogi. Ek bar setup karo — phir automatic!</div>
+<div class="sstep"><div class="sstep-num">1</div><div class="sstep-body"><strong>Google Sheet banao</strong><br>Google Sheets open karo → New blank sheet → Name: "PYB Finance OS"</div></div>
+<div class="sstep"><div class="sstep-num">2</div><div class="sstep-body"><strong>Apps Script open karo</strong><br>Extensions → Apps Script → Yeh code paste karo:<div class="code-box" id="script-code">function doPost(e){var ss=SpreadsheetApp.getActiveSpreadsheet();var data=JSON.parse(e.postData.contents);var sheet=ss.getSheetByName(data.sheet)||ss.insertSheet(data.sheet);sheet.appendRow(data.row);return ContentService.createTextOutput("OK");}</div><button class="btn btn-gold btn-sm mt8" onclick="copyScript()">Copy Script</button></div></div>
+<div class="sstep"><div class="sstep-num">3</div><div class="sstep-body"><strong>Deploy as Web App</strong><br>Deploy → New Deployment → Type: Web App → Execute as: Me → Anyone: Anyone → Deploy → Copy URL</div></div>
+<div class="sstep"><div class="sstep-num">4</div><div class="sstep-body"><strong>URL yahan paste karo</strong><div class="flex g8 mt8"><input type="text" id="sheets-url" placeholder="https://script.google.com/macros/s/..." style="flex:1;background:var(--bg4);border:1px solid var(--line);border-radius:8px;padding:6px 11px;color:var(--snow);font-size:11px;outline:none"><button class="btn btn-gold btn-sm" onclick="saveSheetURL()">Save</button></div></div></div>
+<div class="sstep"><div class="sstep-num">5</div><div class="sstep-body"><strong>Connect & Sync</strong><div class="flex g8 mt8"><button class="btn btn-em btn-sm" onclick="testSheets()">🔌 Test</button><button class="btn btn-gold btn-sm" onclick="syncAll()">📤 Sync All Now</button></div><div class="f11 c-silver mt8" id="sh-status">Not connected</div></div></div>
+<div class="flex g10 mt20"><button class="btn btn-ghost" onclick="closeM('m-sheets')">Close</button></div></div></div>
+
+<script>
+/* ══ STATE ══ */
+let S={cur:'PKR',month:'2025-05',sheetsURL:'',bizInc:[],bizExp:[],perInc:[],perExp:[],debts:[],buckets:[],assets:[],ownerSalary:0,efData:{exp:0,saved:0,months:6},budCats:[{n:'Rent / Housing',b:0},{n:'Food & Groceries',b:0},{n:'Transport',b:0},{n:'Utilities / Bills',b:0},{n:'Education / Kids',b:0},{n:'Medical',b:0},{n:'Savings (First!)',b:0},{n:'Emergency Fund',b:0},{n:'Other',b:0}]};
+try{const d=localStorage.getItem('pyb-fin-v2');if(d)S={...S,...JSON.parse(d)}}catch(e){}
+
+function save(){
+  try{localStorage.setItem('pyb-fin-v2',JSON.stringify(S))}catch(e){}
+  updDash();
+  const dc=document.getElementById('sb-debt');
+  if(dc)dc.textContent=S.debts.length||'';
+}
+
+/* ══ FORMAT ══ */
+function f(n){
+  const v=Math.round(Math.abs(n));
+  const sg=n<0?'−':'';
+  if(S.cur==='USD'){const u=Math.round(v/280);if(u>=1000000)return sg+'$'+(u/1000000).toFixed(2)+'M';if(u>=1000)return sg+'$'+(u/1000).toFixed(1)+'K';return sg+'$'+u.toLocaleString()}
+  if(v>=10000000)return sg+'Rs.'+(v/10000000).toFixed(2)+'Cr';
+  if(v>=100000)return sg+'Rs.'+(v/100000).toFixed(2)+'L';
+  if(v>=1000)return sg+'Rs.'+(v/1000).toFixed(1)+'K';
+  return sg+'Rs.'+v.toLocaleString();
+}
+function fs(n){return(n>=0?'+':'−')+f(Math.abs(n))}
+function el(id){return document.getElementById(id)}
+function sv(id,val,col){const e=el(id);if(e){e.textContent=val;if(col)e.style.color=col}}
+function pct(a,b){return b>0?Math.min((a/b)*100,100):0}
+
+/* ══ NAV ══ */
+function go(id,elem){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-link').forEach(n=>n.classList.remove('on'));
+  const pg=el('page-'+id);if(pg)pg.classList.add('on');
+  if(elem)elem.classList.add('on');
+  const fns={dashboard:updDash,decisions:updDec,ratios:updRatios,'b-income':renderBI,'b-expense':renderBE,'b-profit':updProfit,cashflow:updCF,'p-income':renderPI,'p-expense':renderPE,budget:renderBudget,debt:renderDebt,savings:renderSav,networth:renderNW,report:updReport};
+  if(fns[id])fns[id]();
+}
+
+/* ══ CURRENCY ══ */
+function setCur(c,btn){S.cur=c;document.querySelectorAll('.cur-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');save()}
+
+/* ══ MODAL ══ */
+function openM(id){el(id).classList.add('open');el(id).querySelectorAll('input[type="date"]').forEach(d=>{if(!d.value)d.value=new Date().toISOString().split('T')[0]})}
+function closeM(id){el(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+/* ══ DATA ══ */
+function mBI(){return S.bizInc.filter(i=>i.month===S.month)}
+function mBE(){return S.bizExp.filter(i=>i.month===S.month)}
+function mPI(){return S.perInc.filter(i=>i.month===S.month)}
+function mPE(){return S.perExp.filter(i=>i.month===S.month)}
+function sum(arr,k='amount'){return arr.reduce((s,i)=>s+(parseFloat(i[k])||0),0)}
+
+function getM(){
+  const bI=sum(mBI()),bE=sum(mBE()),bP=bI-bE;
+  const pI=sum(mPI()),pE=sum(mPE());
+  const pEss=sum(mPE().filter(e=>e.cat==='ess'));
+  const pNon=sum(mPE().filter(e=>e.cat==='non'));
+  const pEmo=sum(mPE().filter(e=>e.cat==='emo'));
+  const pSta=sum(mPE().filter(e=>e.cat==='sta'));
+  const pHab=sum(mPE().filter(e=>e.cat==='hab'));
+  const dM=S.debts.reduce((s,d)=>s+d.mon,0);
+  const tD=S.debts.reduce((s,d)=>s+d.tot,0);
+  const cS=(S.efData.saved||0)+S.buckets.reduce((s,b)=>s+b.saved,0);
+  const np=pI-pE-dM;
+  const cr=(pE+dM)>0?cS/(pE+dM):0;
+  const er=pI>0?(pE/pI)*100:0;
+  const sr=pI>0?Math.max(0,np/pI)*100:0;
+  const dti=pI>0?(dM/pI)*100:0;
+  const tA=S.assets.filter(a=>a.type==='asset').reduce((s,a)=>s+a.val,0)+cS;
+  const tL=S.assets.filter(a=>a.type==='liability').reduce((s,a)=>s+a.val,0)+tD;
+  const nw=tA-tL;
+  const inv=S.buckets.filter(b=>b.purpose==='Investment Capital').reduce((s,b)=>s+b.saved,0);
+  const ir=pI>0?(inv/pI)*100:0;
+  const lcr=pEss>0?cS/pEss:0;
+  return{bI,bE,bP,pI,pE,pEss,pNon,pEmo,pSta,pHab,dM,tD,cS,np,cr,er,sr,dti,tA,tL,nw,inv,ir,lcr};
+}
+
+/* ══ DASHBOARD ══ */
+function updDash(){
+  const m=getM();
+  setKPI('d-cr',m.cr.toFixed(2),'em',m.cr<1?'st-bad':m.cr<1.5?'st-ok':'st-good',m.cr<1?'⚠️ At Risk':m.cr<1.5?'⚡ Surviving':m.cr<3?'✅ Stable':'💪 Strong',Math.min(m.cr/4*100,100),'d-cr-b');
+  setKPI('d-er',m.er.toFixed(0)+'%','sky',m.er>=90?'st-bad':m.er>=70?'st-ok':'st-good',m.er>=90?'🔴 Dangerous':m.er>=70?'⚠️ Unstable':m.er>=50?'✅ Good':'🌟 Excellent',m.er,'d-er-b');
+  setKPI('d-sr',m.sr.toFixed(0)+'%','gold',m.sr<=0?'st-bad':m.sr<10?'st-ok':'st-good',m.sr<=0?'🔴 Danger':m.sr<10?'⚡ Basic':m.sr<20?'✅ Good':'💪 Strong',m.sr,'d-sr-b');
+  setKPI('d-dti',m.dti.toFixed(0)+'%','violet',m.dti>=40?'st-bad':m.dti>=20?'st-ok':'st-good',m.dti>=40?'🔴 Danger':m.dti>=20?'⚠️ Risk':'✅ Safe',m.dti,'d-dti-b');
+  const npEl=el('d-np');if(npEl){npEl.textContent=fs(m.np);npEl.style.color=m.np>0?'var(--em)':m.np===0?'var(--amber)':'var(--rose)'}
+  const npS=el('d-np-s');if(npS){npS.textContent=m.np>0?'✅ Positive':m.np===0?'⚡ Break-Even':'🚨 Negative!';npS.className='kpi-st '+(m.np>0?'st-good':m.np===0?'st-ok':'st-bad')}
+  sv('d-binc',f(m.bI),'var(--em)');sv('d-bexp',f(m.bE),'var(--rose)');
+  sv('d-bpro',f(m.bP));el('d-bpro')&&(el('d-bpro').style.color=m.bP>=0?'var(--em)':'var(--rose)');
+  sv('d-osal',f(S.ownerSalary||0),'var(--gold)');
+  sv('d-marg',m.bI>0?((m.bP/m.bI)*100).toFixed(1)+'%':'—');
+  sv('d-rei',f(Math.max(0,m.bP-(S.ownerSalary||0))),'var(--em)');
+  sv('d-pinc',f(m.pI),'var(--em)');sv('d-pexp',f(m.pE),'var(--rose)');
+  sv('d-pess',f(m.pEss),'var(--amber)');sv('d-psav',f(Math.max(0,m.np)),'var(--em)');
+  const efT=S.efData.exp*S.efData.months;
+  sv('d-ef',efT>0?f(S.efData.saved)+'/'+f(efT):'Not Set');
+  const cfEl=el('d-cf');if(cfEl){cfEl.textContent=m.np>0?'✅ Positive':m.np===0?'⚡ Break-even':'🔴 Negative';cfEl.style.color=m.np>0?'var(--em)':m.np===0?'var(--amber)':'var(--rose)'}
+  sv('d-tdt',f(m.tD),'var(--rose)');sv('d-tsv',f(m.cS),'var(--em)');
+  sv('d-nw',f(m.nw));el('d-nw')&&(el('d-nw').style.color=m.nw>=0?'var(--gold)':'var(--rose)');
+  sv('lk-non',f(m.pNon),'var(--rose)');sv('lk-emo',f(m.pEmo),'var(--amber)');
+  sv('lk-sta',f(m.pSta),'var(--rose)');sv('lk-hab',f(m.pHab),'var(--violet)');
+  const lkTot=(m.pNon+m.pEmo+m.pSta+m.pHab);
+  sv('lk-yr',f(lkTot*12),'var(--rose)');
+  sv('lk-5yr',f(Math.round(lkTot*12*((Math.pow(1.12,5)-1)/0.12))),'var(--gold)');
+  updStage(m);updAlerts(m);
+}
+function setKPI(id,val,col,stCls,stTxt,barP,barId){
+  const v=el(id);if(v){v.textContent=val;v.className='kpi-val mono c-'+col}
+  const s=el(id+'-s');if(s){s.textContent=stTxt;s.className='kpi-st '+stCls}
+  const b=el(barId);if(b)b.style.width=Math.min(barP,100)+'%';
+}
+function updStage(m){
+  const names=['Survival','Control','Stability','Debt Elimination','Safety Net','Income Expansion','Wealth Building','Asset Accumulation','Financial Independence','Financial Freedom','Wealth Scaling','Generational Wealth'];
+  let s=0;
+  if(m.pI>0)s=1;if(m.er<90&&m.np>=0)s=2;if(m.er<70&&m.sr>=5)s=3;
+  if(S.debts.length===0&&s>=3)s=4;if((S.efData.saved||0)>=(S.efData.exp*S.efData.months)*0.5&&s>=4)s=5;
+  if(S.perInc.filter(i=>!i.type.includes('Owner')).length>0&&s>=5)s=6;
+  if(m.sr>=20&&s>=6)s=7;if(m.nw>0&&s>=7)s=8;
+  const bar=el('stage-bar');if(bar)bar.innerHTML=names.map((n,i)=>`<div class="s-pill ${i<s?'done':i===s?'now':''}" title="${n}">${i+1}</div>`).join('');
+  sv('stage-name',`Stage ${s+1}: ${names[s]||'Generational Wealth'}`,'var(--gold)');
+  sv('stage-next',names[s+1]?`→ Next: ${names[s+1]}`:'🏆 Top Level!','var(--silver)');
+}
+function updAlerts(m){
+  let h='';
+  if(m.er>=90)h+=`<div class="alert alert-rose"><span class="alert-ico">🔴</span><strong>Expense Ratio ${m.er.toFixed(0)}% — Critical!</strong> Income ka 90%+ kharche mein. Non-essential expenses fori band karo.</div>`;
+  if(m.dti>=40)h+=`<div class="alert alert-rose"><span class="alert-ico">⚠️</span><strong>DTI ${m.dti.toFixed(0)}% — Danger!</strong> Income ka 40%+ debt payments. Debt elimination priority #1.</div>`;
+  if(m.np<0)h+=`<div class="alert alert-rose"><span class="alert-ico">🚨</span><strong>Negative Cash Flow!</strong> Har mahine ${f(Math.abs(m.np))} zyada kharch. Fori action chahiye.</div>`;
+  if(m.sr<10&&m.pI>0)h+=`<div class="alert alert-amber"><span class="alert-ico">💡</span><strong>Saving Rate sirf ${m.sr.toFixed(0)}%</strong> — Minimum 10-20% chahiye. Save First model follow karo.</div>`;
+  if(!S.efData.exp)h+=`<div class="alert alert-sky"><span class="alert-ico">ℹ️</span>Emergency Fund set nahi. Savings Buckets mein ja kar zaroor set karo.</div>`;
+  if(S.debts.some(d=>d.type==='interest'))h+=`<div class="alert alert-amber"><span class="alert-ico">⚠️</span>Interest-based debt hai — Avalanche method se PEHLE clear karo!</div>`;
+  if(m.bI>0&&!S.ownerSalary)h+=`<div class="alert alert-sky"><span class="alert-ico">💼</span>Business income hai lekin Owner Salary set nahi. Profit & Owner Pay → fix karo.</div>`;
+  el('dash-alerts').innerHTML=h;
+}
+
+/* ══ RATIOS ══ */
+function updRatios(){
+  const m=getM();
+  const setR=(id,val,col,stCls,stTxt)=>{
+    const v=el(id);if(v){v.textContent=val;v.className='kpi-val mono c-'+col}
+    const s=el(id+'-s');if(s){s.textContent=stTxt;s.className='kpi-st mt8 '+stCls}
+  };
+  setR('r-cr',m.cr.toFixed(2),'em',m.cr<1?'st-bad':m.cr<1.5?'st-ok':'st-good',m.cr<1?'⚠️ At Risk':m.cr<1.5?'⚡ Surviving':m.cr<3?'✅ Stable':'💪 Strong');
+  setR('r-er',m.er.toFixed(0)+'%','sky',m.er>=90?'st-bad':m.er>=70?'st-ok':'st-good',m.er>=90?'🔴 Dangerous':m.er>=70?'⚠️ Unstable':m.er>=50?'✅ Good':'🌟 Excellent');
+  setR('r-sr',m.sr.toFixed(0)+'%','gold',m.sr<=0?'st-bad':m.sr<10?'st-ok':'st-good',m.sr<=0?'🔴 Danger':m.sr<10?'⚡ Basic':m.sr<20?'✅ Good':'💪 Strong');
+  setR('r-dti',m.dti.toFixed(0)+'%','violet',m.dti>=40?'st-bad':m.dti>=20?'st-ok':'st-good',m.dti>=40?'🔴 Danger':m.dti>=20?'⚠️ Risk':'✅ Safe');
+  setR('r-lcr',m.lcr.toFixed(1),'em',m.lcr<1?'st-bad':m.lcr<3?'st-ok':'st-good',m.lcr<1?'⚠️ Exposed':m.lcr<3?'⚡ Building':m.lcr<6?'✅ Safe':'💪 Strong');
+  setR('r-ir',m.ir.toFixed(0)+'%','sky',m.ir===0?'st-ok':m.ir<15?'st-good':'st-gold',m.ir===0?'No Growth':m.ir<15?'✅ Building':'💪 Wealth Mode');
+}
+
+/* ══ BUSINESS INCOME ══ */
+function addBI(){
+  const amt=parseFloat(el('bi-amt').value)||0;if(!amt)return alert('Amount daalo!');
+  const e={id:Date.now(),month:S.month,date:el('bi-date').value,cat:el('bi-cat').value,cli:el('bi-cli').value,rev:parseFloat(el('bi-rev').value)||0,amount:amt,status:el('bi-st').value,note:el('bi-note').value};
+  S.bizInc.push(e);save();closeM('m-bi');renderBI();
+  syncSheet('Business_Income',[e.date,e.month,e.cat,e.cli,e.rev,e.amount,e.status,e.note||'']);
+  ['bi-amt','bi-cli','bi-note'].forEach(i=>{if(el(i))el(i).value=''});
+}
+function renderBI(){
+  const data=mBI();const tot=sum(data);const ytd=sum(S.bizInc.filter(i=>i.month.startsWith(S.month.split('-')[0])));
+  sv('bi-tot',f(tot));sv('bi-cnt',data.length);sv('bi-avg',data.length?f(tot/data.length):'0');sv('bi-ytd',f(ytd));
+  el('bi-tbody').innerHTML=!data.length?emR(8,'💰','No income entries yet'):data.map(i=>`<tr><td class="c-silver f11">${i.date}</td><td><span class="badge bg-em">${i.cat}</span></td><td class="fw5">${i.cli||'—'}</td><td class="mono f11 c-silver">${i.rev?f(i.rev):'—'}</td><td class="mono fw6 c-em">${f(i.amount)}</td><td class="c-silver">${i.note||'—'}</td><td><span class="badge ${i.status==='Received'?'bg-em':i.status==='Pending'?'bg-amber':'bg-sky'}">${i.status}</span></td><td><button class="btn btn-rose btn-xs" onclick="delBI(${i.id})">×</button></td></tr>`).join('');
+}
+function delBI(id){S.bizInc=S.bizInc.filter(i=>i.id!==id);save();renderBI()}
+
+/* ══ BUSINESS EXPENSE ══ */
+function addBE(){
+  const amt=parseFloat(el('be-amt').value)||0;if(!amt)return alert('Amount daalo!');
+  const e={id:Date.now(),month:S.month,date:el('be-date').value,cat:el('be-cat').value,desc:el('be-desc').value,type:el('be-type').value,ess:el('be-ess').value,amount:amt};
+  S.bizExp.push(e);save();closeM('m-be');renderBE();
+  syncSheet('Business_Expenses',[e.date,e.month,e.cat,e.desc,e.type,e.ess,e.amount]);
+}
+function renderBE(){
+  const data=mBE();const cats={tools:0,team:0,mkt:0,oth:0};
+  data.forEach(e=>{cats[e.cat]=(cats[e.cat]||0)+e.amount});
+  sv('bc-tools',f(cats.tools));sv('bc-team',f(cats.team));sv('bc-mkt',f(cats.mkt));sv('bc-oth',f(cats.oth||0));
+  el('be-tbody').innerHTML=!data.length?emR(7,'📤','No expense entries yet'):data.map(e=>`<tr><td class="c-silver f11">${e.date}</td><td><span class="badge bg-amber">${e.cat}</span></td><td>${e.desc}</td><td><span class="badge ${e.type==='Fixed'?'bg-sky':'bg-vio'}">${e.type}</span></td><td><span class="badge ${e.ess.includes('Yes')?'bg-em':'bg-rose'}">${e.ess.includes('Yes')?'Essential':'Can Cut'}</span></td><td class="mono fw6 c-rose">${f(e.amount)}</td><td><button class="btn btn-rose btn-xs" onclick="delBE(${e.id})">×</button></td></tr>`).join('');
+}
+function delBE(id){S.bizExp=S.bizExp.filter(i=>i.id!==id);save();renderBE()}
+
+/* ══ PROFIT ══ */
+function updProfit(){
+  const bI=sum(mBI()),bE=sum(mBE()),net=bI-bE;
+  sv('p-gross',f(bI));sv('p-exp',f(bE));sv('p-net',f(net));
+  el('p-net')&&(el('p-net').style.color=net>=0?'var(--em)':'var(--rose)');
+  el('op-profit').value=Math.max(0,net);calcOwner();
+}
+function calcOwner(){
+  const pro=parseFloat(el('op-profit').value)||0;const p=parseFloat(el('op-pct').value)||25;
+  el('op-rei-p').value=100-p;
+  sv('op-sal',f(pro*p/100));sv('op-rei',f(pro*(1-p/100)));
+  sv('op-mrg',sum(mBI())>0?((pro/sum(mBI()))*100).toFixed(1)+'%':'0%');
+  sv('op-ann',f(pro*p/100*12));
+}
+function saveOwner(){const pro=parseFloat(el('op-profit').value)||0;const p=parseFloat(el('op-pct').value)||25;S.ownerSalary=pro*p/100;save();alert('✓ Owner salary saved: '+f(S.ownerSalary))}
+
+/* ══ CASH FLOW ══ */
+function updCF(){
+  const m=getM();
+  sv('cf-in',f(m.pI));sv('cf-out',f(m.pE+m.dM));sv('cf-net',fs(m.np));
+  el('cf-net')&&(el('cf-net').style.color=m.np>0?'var(--em)':m.np===0?'var(--amber)':'var(--rose)');
+  const st=el('cf-st');if(st){st.textContent=m.np>0?'Positive — Growth Potential':m.np===0?'Break-even — Stuck':'Negative — Debt Risk';st.className='kpi-st '+(m.np>0?'st-good':m.np===0?'st-ok':'st-bad')}
+  const lkTot=(m.pNon+m.pEmo+m.pSta+m.pHab);
+  sv('lk2-non',f(m.pNon));sv('lk2-yr',f(lkTot*12));
+  sv('lk2-5yr',f(Math.round(lkTot*12*((Math.pow(1.12,5)-1)/0.12))));
+  sv('lk2-cut',f(lkTot*0.5*12)+'/yr');
+}
+
+/* ══ PERSONAL INCOME ══ */
+function addPI(){
+  const amt=parseFloat(el('pi-amt').value)||0;if(!amt)return alert('Amount daalo!');
+  const e={id:Date.now(),month:S.month,date:el('pi-date').value,type:el('pi-type').value,src:el('pi-src').value,amount:amt,note:el('pi-note').value};
+  S.perInc.push(e);save();closeM('m-pi');renderPI();
+  syncSheet('Personal_Income',[e.date,e.month,e.type,e.src||'',e.amount,e.note||'']);
+}
+function renderPI(){
+  const data=mPI();const tot=sum(data);const own=sum(data.filter(i=>i.type.includes('Owner')));
+  sv('pi-tot',f(tot));sv('pi-own',f(own));sv('pi-sid',f(tot-own));
+  el('pi-tbody').innerHTML=!data.length?emR(6,'👤','No personal income yet'):data.map(i=>`<tr><td class="c-silver f11">${i.date}</td><td><span class="badge bg-em">${i.type}</span></td><td>${i.src||'—'}</td><td class="mono fw6 c-em">${f(i.amount)}</td><td class="c-silver">${i.note||'—'}</td><td><button class="btn btn-rose btn-xs" onclick="delPI(${i.id})">×</button></td></tr>`).join('');
+}
+function delPI(id){S.perInc=S.perInc.filter(i=>i.id!==id);save();renderPI()}
+
+/* ══ PERSONAL EXPENSE ══ */
+function addPE(){
+  const amt=parseFloat(el('pe-amt').value)||0;if(!amt)return alert('Amount daalo!');
+  const e={id:Date.now(),month:S.month,date:el('pe-date').value,cat:el('pe-cat').value,type:el('pe-type').value,desc:el('pe-desc').value,amount:amt};
+  S.perExp.push(e);save();closeM('m-pe');renderPE();
+  syncSheet('Personal_Expenses',[e.date,e.month,e.cat,e.desc,e.type,e.amount,e.amount*12]);
+}
+function renderPE(){
+  const data=mPE();const cats={ess:0,non:0,emo:0,sta:0,hab:0};
+  data.forEach(e=>{cats[e.cat]=(cats[e.cat]||0)+e.amount});
+  sv('pc-ess',f(cats.ess));sv('pc-non',f(cats.non));sv('pc-emo',f(cats.emo));sv('pc-sta',f(cats.sta));sv('pc-hab',f(cats.hab));
+  const bm={ess:'bg-em',non:'bg-amber',emo:'bg-rose',sta:'bg-vio',hab:'bg-sky'};
+  el('pe-tbody').innerHTML=!data.length?emR(7,'🏠','No personal expenses yet'):data.map(e=>`<tr><td class="c-silver f11">${e.date}</td><td><span class="badge ${bm[e.cat]||'bg-slate'}">${e.cat}</span></td><td><span class="badge ${e.type==='Fixed'?'bg-sky':'bg-vio'}">${e.type}</span></td><td>${e.desc}</td><td class="mono fw6 c-rose">${f(e.amount)}</td><td class="mono f11 c-amber">${f(e.amount*12)}/yr</td><td><button class="btn btn-rose btn-xs" onclick="delPE(${e.id})">×</button></td></tr>`).join('');
+}
+function delPE(id){S.perExp=S.perExp.filter(i=>i.id!==id);save();renderPE()}
+
+/* ══ BUDGET ══ */
+function renderBudget(){
+  const inc=parseFloat(el('bud-inc').value)||0;const pE=mPE();let totB=0;
+  el('bud-tbody').innerHTML=S.budCats.map((cat,idx)=>{
+    const act=pE.filter(e=>e.desc.toLowerCase().includes(cat.n.split('/')[0].trim().toLowerCase())).reduce((s,e)=>s+e.amount,0);
+    const rem=cat.b-act;totB+=cat.b;const p=cat.b>0?Math.min((act/cat.b)*100,100):0;
+    const st=act>cat.b?'bg-rose':act>cat.b*.85?'bg-amber':'bg-em';
+    return`<tr><td class="fw5">${cat.n}</td><td><input class="iinput" type="number" value="${cat.b}" onchange="updBC(${idx},this.value)" placeholder="0"></td><td class="mono fw6">${f(act)}</td><td class="mono fw6 ${rem>=0?'c-em':'c-rose'}">${f(Math.abs(rem))} ${rem>=0?'left':'over'}</td><td class="f11">${p.toFixed(0)}%</td><td><span class="badge ${st}">${act>cat.b?'⚠️ Over':act>cat.b*.85?'⚡ Near':'✅ OK'}</span></td></tr>`;
+  }).join('');
+  const una=inc-totB;
+  sv('b-tinc',f(inc),'var(--em)');sv('b-tbud',f(totB));
+  sv('b-una',f(una));el('b-una')&&(el('b-una').style.color=una>=0?'var(--em)':'var(--rose)');
+}
+function updBC(i,v){S.budCats[i].b=parseFloat(v)||0;save();renderBudget()}
+function addBudRow(){const n=prompt('Category name:');if(n){S.budCats.push({n,b:0});save();renderBudget()}}
+function applyMethod(){const inc=parseFloat(el('bud-inc').value)||0;if(el('bud-meth').value==='503020'&&inc>0){S.budCats[0].b=inc*.3;S.budCats[1].b=inc*.15;S.budCats[2].b=inc*.05;S.budCats[3].b=inc*.05;S.budCats[6].b=inc*.2;save();renderBudget()}}
+
+/* ══ DEBT ══ */
+function addDebt(){
+  const tot=parseFloat(el('dt-tot').value)||0;if(!tot)return alert('Total amount daalo!');
+  const e={id:Date.now(),cred:el('dt-cred').value,tot,mon:parseFloat(el('dt-mon').value)||0,int:parseFloat(el('dt-int').value)||0,due:el('dt-due').value,type:el('dt-type').value,strat:el('dt-strat').value,paid:parseFloat(el('dt-paid').value)||0};
+  S.debts.push(e);save();closeM('m-debt');renderDebt();
+  syncSheet('Debts',[e.cred,e.tot,e.mon,e.int,e.due,e.type,e.paid]);
+}
+function renderDebt(){
+  const tD=S.debts.reduce((s,d)=>s+d.tot,0);const tM=S.debts.reduce((s,d)=>s+d.mon,0);
+  const pI=sum(mPI());const dti=pI>0?((tM/pI)*100).toFixed(1):0;
+  sv('dt-tot',f(tD),'var(--rose)');sv('dt-mon',f(tM),'var(--amber)');sv('dt-dti',dti+'%');
+  const ds=el('dt-dti-s');if(ds){ds.textContent=dti<20?'✅ Safe':dti<40?'⚠️ Risk':'🔴 Danger';ds.className='kpi-st '+(dti<20?'st-good':dti<40?'st-ok':'st-bad')}
+  el('dt-tbody').innerHTML=!S.debts.length?emR(9,'✅','No debts — great!'):
+    [...S.debts].sort((a,b)=>a.strat-b.strat).map(d=>{
+      const p=d.tot>0?Math.min((d.paid/d.tot)*100,100):0;
+      const tc=d.type==='interest'||d.type==='credit'?'bg-rose':'bg-amber';
+      const pc=d.strat=='1'?'bg-rose':d.strat=='2'?'bg-amber':'bg-em';
+      return`<tr><td class="fw6">${d.cred}</td><td class="mono fw6 c-rose">${f(d.tot)}</td><td class="mono">${f(d.mon)}/mo</td><td class="c-silver">${d.due?d.due+'th':'—'}</td><td class="c-amber mono">${d.int?d.int+'%':'—'}</td><td><span class="badge ${tc}">${d.type}</span></td><td><span class="badge ${pc}">${d.strat==='1'?'Avalanche':d.strat==='2'?'Snowball':'Min'}</span></td><td style="min-width:100px"><div class="prog"><div class="prog-f ${p>70?'pf-em':'pf-amber'}" style="width:${p}%"></div></div><div class="f10 c-silver mt8">${p.toFixed(0)}% paid</div></td><td><button class="btn btn-rose btn-xs" onclick="delDt(${d.id})">×</button></td></tr>`;
+    }).join('');
+}
+function delDt(id){S.debts=S.debts.filter(d=>d.id!==id);save();renderDebt()}
+
+/* ══ SAVINGS ══ */
+function updEF(){
+  const exp=parseFloat(el('ef-exp').value)||0;const sav=parseFloat(el('ef-sav').value)||0;const mo=parseInt(el('ef-mo').value)||6;
+  const tgt=exp*mo;const p=pct(sav,tgt);
+  sv('ef-s-l',f(sav),'var(--em)');sv('ef-t-l',f(tgt));sv('ef-pct',p.toFixed(0)+'%','var(--gold)');
+  const mI=sum(mPI())*0.1;sv('ef-ml',mI>0?Math.ceil((tgt-sav)/mI)+' months':'Set income first','var(--amber)');
+  const bar=el('ef-bar');if(bar)bar.style.width=p+'%';
+  S.efData={exp,saved:sav,months:mo};save();
+}
+function addBucket(){
+  const n=el('sv-name').value;if(!n)return alert('Name daalo!');
+  S.buckets.push({id:Date.now(),name:n,icon:el('sv-ico').value||'🎯',target:parseFloat(el('sv-tgt').value)||0,saved:parseFloat(el('sv-sav').value)||0,monthly:parseFloat(el('sv-mo').value)||0,timeline:parseFloat(el('sv-time').value)||0,purpose:el('sv-pur').value});
+  save();closeM('m-sav');renderSav();
+}
+function renderSav(){
+  if(!S.buckets.length){el('sav-grid').innerHTML='';return}
+  el('sav-grid').innerHTML=S.buckets.map(b=>{
+    const p=pct(b.saved,b.target);const mtc=b.monthly>0?Math.ceil((b.target-b.saved)/b.monthly):'∞';
+    return`<div class="bucket"><div class="bkt-hd"><div class="bkt-ico">${b.icon}</div><div><div class="bkt-name">${b.name}</div><div class="bkt-pur">${b.purpose}</div></div></div><div class="fbet f11 c-silver"><span>Saved: <strong class="c-em">${f(b.saved)}</strong></span><span>Target: <strong>${f(b.target)}</strong></span></div><div class="prog mt8"><div class="prog-f pf-gold" style="width:${p}%"></div></div><div class="fbet mt8 f10 c-silver"><span>${p.toFixed(0)}% done</span><span>${mtc} months</span><span>${f(b.monthly)}/mo</span></div><div class="flex g8 mt12"><button class="btn btn-em btn-sm" onclick="addToS(${b.id})">+ Add</button><button class="btn btn-rose btn-sm" onclick="delBkt(${b.id})">Remove</button></div></div>`;
+  }).join('');
+}
+function addToS(id){const a=parseFloat(prompt('Amount add karo:'))||0;if(a>0){const b=S.buckets.find(x=>x.id===id);if(b){b.saved+=a;save();renderSav()}}}
+function delBkt(id){S.buckets=S.buckets.filter(b=>b.id!==id);save();renderSav()}
+
+/* ══ NET WORTH ══ */
+function addAsset(){
+  const n=el('as-name').value;if(!n)return alert('Name daalo!');
+  S.assets.push({id:Date.now(),name:n,type:el('as-type').value,cat:el('as-cat').value,val:parseFloat(el('as-val').value)||0});
+  save();closeM('m-asset');renderNW();
+}
+function renderNW(){
+  const m=getM();sv('nw-a',f(m.tA),'var(--em)');sv('nw-l',f(m.tL),'var(--rose)');
+  sv('nw-n',f(m.nw));el('nw-n')&&(el('nw-n').style.color=m.nw>=0?'var(--gold)':'var(--rose)');
+  const ns=el('nw-s');if(ns){ns.textContent=m.nw>=0?'✅ Positive Net Worth':'⚠️ Negative Net Worth';ns.className='kpi-st '+(m.nw>=0?'st-good':'st-bad')}
+  const assets=S.assets.filter(a=>a.type==='asset');const liabs=S.assets.filter(a=>a.type==='liability');
+  el('asset-list').innerHTML=assets.length?assets.map(a=>`<div class="sr"><span class="sr-lbl">${a.name} <span class="badge bg-em">${a.cat}</span></span><span class="sr-val c-em">${f(a.val)}</span></div>`).join(''):`<div class="tbl-empty"><div class="tbl-empty-ico">🏛️</div><p>No assets yet</p></div>`;
+  el('liab-list').innerHTML=liabs.length?liabs.map(a=>`<div class="sr"><span class="sr-lbl">${a.name} <span class="badge bg-rose">${a.cat}</span></span><span class="sr-val c-rose">${f(a.val)}</span></div>`).join(''):`<div class="tbl-empty"><div class="tbl-empty-ico">✅</div><p>No liabilities!</p></div>`;
+}
+
+/* ══ DECISIONS ══ */
+function updDec(){
+  const m=getM();
+  if(m.pI===0&&m.bI===0){el('dec-content').innerHTML=`<div class="alert alert-sky"><span class="alert-ico">ℹ️</span>Pehle income aur expenses enter karo. Phir yahan complete analysis aayegi.</div>`;return}
+  const mistakes=[],goods=[],steps=[];
+  if(m.er>=90)mistakes.push({cls:'dec-bad',t:`Critical Expense Ratio — ${m.er.toFixed(0)}%`,b:`Income ka ${m.er.toFixed(0)}% kharche mein. Global standard 50% se neeche lao. Non-essential, emotional, status expenses fori band karo.`});
+  if(m.sr<10&&m.pI>0)mistakes.push({cls:'dec-bad',t:`Low Saving Rate — ${m.sr.toFixed(0)}%`,b:`Global standard minimum 10-20%. Save First: salary aate hi Rs.${f(m.pI*.1)} alag karo. Savings = fixed expense treat karo.`});
+  if(m.dti>=20)mistakes.push({cls:m.dti>=40?'dec-bad':'dec-ok',t:`High DTI — ${m.dti.toFixed(0)}%`,b:m.dti>=40?'DANGER ZONE! 40%+ debt payments. Avalanche method: highest interest first. Never panic-invest to escape debt.':'Risk zone. Debt elimination priority badhao.'});
+  if(m.np<0)mistakes.push({cls:'dec-bad',t:'Negative Cash Flow!',b:`Har mahine Rs.${f(Math.abs(m.np))} zyada kharch. Income badhao ya expenses kato — dono saath. Emergency hai.`});
+  if(m.bI>0&&!S.ownerSalary)mistakes.push({cls:'dec-ok',t:'Business ≠ Personal Not Followed',b:'Business income hai lekin owner salary fix nahi. Global best practice: fix salary from profit. 10-40% of net profit.'});
+  if(!S.efData.exp||S.efData.saved<S.efData.exp*S.efData.months*.5)mistakes.push({cls:'dec-ok',t:'Emergency Fund Critical',b:`Global standard: 3-6 months essential expenses. Target: Rs.${f(S.efData.exp*S.efData.months)}. Emergency fund nahi = any crisis = debt.`});
+  if(m.er<60)goods.push('✅ Expense ratio '+m.er.toFixed(0)+'% — excellent zone');
+  if(m.sr>=20)goods.push('✅ Saving rate '+m.sr.toFixed(0)+'% — strong wealth builder');
+  if(m.dti<20)goods.push('✅ DTI '+m.dti.toFixed(0)+'% — debt safe zone');
+  if(m.np>0)goods.push('✅ Positive cash flow — '+f(m.np)+' monthly');
+  if(S.debts.length===0)goods.push('✅ Debt free — excellent!');
+  if(S.ownerSalary>0)goods.push('✅ Owner salary properly structured');
+  if(m.nw>0)goods.push('✅ Positive net worth — wealth is building');
+  let h='';
+  if(mistakes.length){h+=`<div class="sh" style="margin-bottom:10px"><h3><div class="sh-dot" style="background:var(--rose)"></div>⚠️ Financial Mistakes (${mistakes.length})</h3></div>`;mistakes.forEach(x=>{h+=`<div class="dec ${x.cls}"><div class="dec-t">${x.t}</div><div class="dec-b">${x.b}</div></div>`})}
+  if(goods.length){h+=`<div class="sh mt20"><h3><div class="sh-dot"></div>✅ Strengths</h3></div>`;h+=`<div class="dec dec-good"><div class="dec-b">${goods.join('<br>')}</div></div>`}
+  h+=`<div class="sh mt20"><h3><div class="sh-dot" style="background:var(--amber)"></div>🎯 Priority Action Plan</h3></div>`;
+  if(m.np<0)steps.push({t:'🚨 Stop Negative Cash Flow First',b:'Fori non-essential expenses band karo. Income − Expenses positive hona chahiye.'});
+  if(S.debts.some(d=>d.type==='interest'))steps.push({t:'🔴 Clear Interest Debt (Avalanche)',b:'Riba-based debt ASAP. Extra payment on highest interest. Never take new debt to pay old.'});
+  if(!S.efData.exp)steps.push({t:'🆘 Build Emergency Fund',b:`6 months target: ${f(S.efData.exp*S.efData.months||0)}. Start with 2 months. Yeh financial shield hai.`});
+  if(m.sr<10)steps.push({t:'💰 Save First Model',b:'Salary day: immediately save Rs.'+f(m.pI*.1)+'. Treat it as non-negotiable bill.'});
+  if(m.er>=70)steps.push({t:'✂️ Cut Expense Ratio to 70%',b:'Every non-essential, status, habit category review karo. Every Rs. saved = Rs. invested.'});
+  if(steps.length===0)steps.push({t:'🚀 Foundation Strong — Build Wealth Now',b:'All basics checked. Expand income (side/passive), invest surplus, build productive assets.'});
+  steps.forEach((s,i)=>{h+=`<div class="dec"><div class="dec-t"><span style="background:var(--gold);color:#000;width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0">${i+1}</span> ${s.t}</div><div class="dec-b">${s.b}</div></div>`});
+  el('dec-content').innerHTML=h;
+}
+
+/* ══ REPORT ══ */
+function updReport(){
+  const m=getM();const stages=['Survival','Control','Stability','Debt Elimination','Safety Net','Income Expansion','Wealth Building','Asset Accumulation'];
+  let s=0;if(m.pI>0)s=1;if(m.er<90&&m.np>=0)s=2;if(m.er<70&&m.sr>=5)s=3;
+  sv('rp-bi',f(m.bI),'var(--em)');sv('rp-be',f(m.bE),'var(--rose)');sv('rp-bp',f(m.bP));el('rp-bp')&&(el('rp-bp').style.color=m.bP>=0?'var(--em)':'var(--rose)');
+  sv('rp-pi',f(m.pI),'var(--em)');sv('rp-pe',f(m.pE),'var(--rose)');
+  sv('rp-np',fs(m.np));el('rp-np')&&(el('rp-np').style.color=m.np>=0?'var(--em)':'var(--rose)');
+  sv('rp-sv',f(Math.max(0,m.np)),'var(--em)');
+  sv('rp-cr',m.cr.toFixed(2)+(m.cr>=1.5?' ✅':' ⚠️'));sv('rp-er',m.er.toFixed(0)+'%'+(m.er<70?' ✅':' ⚠️'));
+  sv('rp-sr',m.sr.toFixed(0)+'%'+(m.sr>=10?' ✅':' ⚠️'));sv('rp-dti',m.dti.toFixed(0)+'%'+(m.dti<20?' ✅':' ⚠️'));
+  sv('rp-stg',`Stage ${s+1}: ${stages[s]||'Advanced'}`,'var(--gold)');
+  sv('rp-mg',m.bI>0?((m.bP/m.bI)*100).toFixed(1)+'%':'—');
+  sv('rp-nw',f(m.nw)+(m.nw>=0?' ✅':' ⚠️'));
+  let mh='';
+  if(m.er>=70)mh+=`<div class="alert alert-rose"><span class="alert-ico">🔴</span>Expense Ratio ${m.er.toFixed(0)}% — 70% se neeche lao. Rs.${f((m.pE-m.pI*.7))} kam karna hai.</div>`;
+  if(m.sr<10)mh+=`<div class="alert alert-amber"><span class="alert-ico">⚠️</span>Saving Rate ${m.sr.toFixed(0)}% — Minimum 10% chahiye. Monthly Rs.${f(m.pI*.1)} save karo.</div>`;
+  if(m.dti>=20)mh+=`<div class="alert alert-amber"><span class="alert-ico">⚠️</span>DTI ${m.dti.toFixed(0)}% — Debt payments reduce karo.</div>`;
+  if(m.np<0)mh+=`<div class="alert alert-rose"><span class="alert-ico">🚨</span>Negative Cash Flow Rs.${f(Math.abs(m.np))} — Fori action!</div>`;
+  if(!mh)mh=`<div class="alert alert-em"><span class="alert-ico">🎉</span>Excellent! Is month koi badi financial mistake nahi mili.</div>`;
+  el('rp-mistakes').innerHTML=mh;
+  el('rp-actions').innerHTML=`<div style="display:grid;gap:4px">
+    <div class="sr"><span class="sr-lbl">1. Har expense daily track karo</span><span class="badge bg-sky">Ongoing</span></div>
+    ${m.er>=70?`<div class="sr"><span class="sr-lbl">2. Non-essential expenses 20% cut karo</span><span class="badge bg-rose">Urgent</span></div>`:''}
+    ${m.sr<10?`<div class="sr"><span class="sr-lbl">3. Salary day pe Rs.${f(m.pI*.1)} auto-save</span><span class="badge bg-amber">This Month</span></div>`:''}
+    ${S.debts.length?`<div class="sr"><span class="sr-lbl">4. Highest priority debt pe extra payment</span><span class="badge bg-rose">Priority</span></div>`:''}
+    <div class="sr"><span class="sr-lbl">5. Month end family budget review</span><span class="badge bg-em">Scheduled</span></div>
+    <div class="sr"><span class="sr-lbl">6. Google Sheets mein sync karo</span><span class="badge bg-gold">Data Backup</span></div>
+  </div>`;
+}
+
+/* ══ GOOGLE SHEETS ══ */
+function copyScript(){navigator.clipboard.writeText(el('script-code').textContent);alert('Script copied!')}
+function saveSheetURL(){S.sheetsURL=el('sheets-url').value.trim();save();sv('sh-status','✅ URL saved! Test karo.','var(--em)')}
+async function syncSheet(sheet,row){
+  if(!S.sheetsURL)return;
+  try{await fetch(S.sheetsURL,{method:'POST',mode:'no-cors',body:JSON.stringify({sheet,row:[new Date().toISOString(),...row]})})}catch(e){console.log('sync:',e)}
+}
+async function testSheets(){
+  if(!S.sheetsURL){sv('sh-status','URL set nahi!','var(--rose)');return}
+  sv('sh-status','Testing...','var(--amber)');
+  try{await fetch(S.sheetsURL,{method:'POST',mode:'no-cors',body:JSON.stringify({sheet:'Test',row:['Test',new Date().toISOString()]})});sv('sh-status','✅ Connection successful!','var(--em)')}
+  catch(e){sv('sh-status','❌ Error: '+e.message,'var(--rose)')}
+}
+async function syncAll(){
+  if(!S.sheetsURL){alert('Google Sheets URL set karo pehle!');return}
+  sv('sh-status','Syncing all data...','var(--amber)');
+  const m=getM();
+  await syncSheet('Monthly_Summary',[S.month,m.bI,m.bE,m.bP,m.pI,m.pE,m.np,m.cr.toFixed(2),m.er.toFixed(1),m.sr.toFixed(1),m.dti.toFixed(1),m.nw]);
+  for(const i of mBI())await syncSheet('Business_Income',[i.date,i.month,i.cat,i.cli,i.rev,i.amount,i.status,i.note||'']);
+  for(const e of mBE())await syncSheet('Business_Expenses',[e.date,e.month,e.cat,e.desc,e.type,e.ess,e.amount]);
+  for(const i of mPI())await syncSheet('Personal_Income',[i.date,i.month,i.type,i.src||'',i.amount,i.note||'']);
+  for(const e of mPE())await syncSheet('Personal_Expenses',[e.date,e.month,e.cat,e.desc,e.type,e.amount,e.amount*12]);
+  sv('sh-status','✅ All data synced!','var(--em)');
+}
+
+/* ══ EXPORT ══ */
+function exportCSV(){
+  const m=getM();let csv=`PYB Finance OS — ${S.month}\n\n`;
+  csv+=`BUSINESS INCOME\nDate,Month,Category,Client,Gross Rev,Amount,Status,Note\n`;
+  mBI().forEach(i=>{csv+=`${i.date},${i.month},${i.cat},${i.cli||''},${i.rev||0},${i.amount},${i.status},${i.note||''}\n`});
+  csv+=`Total,,,,,${m.bI},,\n\nBUSINESS EXPENSES\nDate,Month,Category,Desc,Type,Essential,Amount\n`;
+  mBE().forEach(e=>{csv+=`${e.date},${e.month},${e.cat},${e.desc},${e.type},${e.ess},${e.amount}\n`});
+  csv+=`Total,,,,,,${m.bE}\n\nPERSONAL INCOME\nDate,Month,Type,Source,Amount,Note\n`;
+  mPI().forEach(i=>{csv+=`${i.date},${i.month},${i.type},${i.src||''},${i.amount},${i.note||''}\n`});
+  csv+=`\nPERSONAL EXPENSES\nDate,Month,Category,Desc,Type,Amount,Annual\n`;
+  mPE().forEach(e=>{csv+=`${e.date},${e.month},${e.cat},${e.desc},${e.type},${e.amount},${e.amount*12}\n`});
+  csv+=`\nKEY RATIOS\nCurrent Ratio,${m.cr.toFixed(2)}\nExpense Ratio,${m.er.toFixed(1)}%\nSaving Rate,${m.sr.toFixed(1)}%\nDTI,${m.dti.toFixed(1)}%\nNet Position,${m.np}\nNet Worth,${m.nw}\n`;
+  const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`PYB-Finance-${S.month}.csv`;a.click();
+}
+
+/* ══ HELPER ══ */
+function emR(c,ico,msg){return`<tr><td colspan="${c}"><div class="tbl-empty"><div class="tbl-empty-ico">${ico}</div><p>${msg}</p></div></td></tr>`}
+
+/* ══ INIT ══ */
+window.onload=()=>{
+  updDash();
+  if(S.efData.exp){el('ef-exp').value=S.efData.exp;el('ef-sav').value=S.efData.saved;el('ef-mo').value=S.efData.months;updEF()}
+  if(S.sheetsURL)el('sheets-url').value=S.sheetsURL;
+  const dc=el('sb-debt');if(dc)dc.textContent=S.debts.length||'';
+};
+</script>
+</body>
+</html>
